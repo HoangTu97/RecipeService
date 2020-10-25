@@ -1,0 +1,10 @@
+runtime/
+docs/
+data/
+*.db
+
+Food
+Food.exe
+
+.vscode
+.DS_Store
