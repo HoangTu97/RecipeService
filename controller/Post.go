@@ -1,17 +1,50 @@
-package PostResource
+package controller
 
 import (
 	"Food/dto"
 	"Food/dto/request"
 	PostRequest "Food/dto/request/post"
 	"Food/dto/response"
+	PostResponse "Food/dto/response/post"
 	"Food/helpers/e"
+	"Food/helpers/pagination"
 	"Food/helpers/security"
 	"Food/service"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 )
+
+type Post interface {
+	GetAll(c *gin.Context)
+	CreatePost(c *gin.Context)
+}
+
+type post struct {
+	service service.Post
+	userService service.User
+	recipeService service.Recipe
+}
+
+func NewPost(service service.Post, userService service.User, recipeService service.Recipe) Post {
+	return &post{service: service, userService: userService, recipeService: recipeService}
+}
+
+// Post all
+// @Summary GetAll
+// @Tags PublicPost
+// @Accept json
+// @Param page query int false "page"
+// @Param size query int false "size"
+// @Success 200 {object} response.APIResponseDTO{data=post.PostListResponseDTO} "desc"
+// @Router /api/public/post [get]
+func (r *post) GetAll(c *gin.Context) {
+	pageable := pagination.GetPage(c)
+
+	page := r.service.FindPage(pageable)
+
+	response.CreateSuccesResponse(c, PostResponse.CreatePostListResponseDTOFromPage(page))
+}
 
 // Post create
 // @Summary CreatePost
@@ -21,7 +54,7 @@ import (
 // @Param body body PostRequest.PostCreateRequestDTO true "body"
 // @Success 200 {object} response.APIResponseDTO "desc"
 // @Router /api/private/post [post]
-func CreatePost(c *gin.Context) {
+func (r *post) CreatePost(c *gin.Context) {
 	userId := security.GetUserID(c)
 
 	var requestDTO PostRequest.PostCreateRequestDTO
@@ -31,7 +64,7 @@ func CreatePost(c *gin.Context) {
 		return
 	}
 
-	userDTO, exists := service.FindOneUserByUserID(userId)
+	userDTO, exists := r.userService.FindOneByUserID(userId)
 	if !exists {
 		response.CreateErrorResponse(c, "USER_NOT_FOUND")
 		return
@@ -45,7 +78,7 @@ func CreatePost(c *gin.Context) {
 	}
 
 	var success bool
-	recipeDTO, success = service.SaveRecipe(recipeDTO)
+	recipeDTO, success = r.recipeService.Save(recipeDTO)
 	if !success {
 		response.CreateErrorResponse(c, "INTERNAL_ERROR")
 		return
@@ -60,7 +93,7 @@ func CreatePost(c *gin.Context) {
 		RecipeID: recipeDTO.ID,
 	}
 
-	_, success = service.SavePost(postDTO)
+	_, success = r.service.Save(postDTO)
 	if !success {
 		response.CreateErrorResponse(c, "INTERNAL_ERROR")
 		return

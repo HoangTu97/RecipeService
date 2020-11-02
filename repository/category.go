@@ -1,21 +1,39 @@
 package repository
 
 import (
-	"Food/config"
 	"Food/helpers/page"
 	"Food/helpers/pagination"
 	"Food/models"
+
+	"gorm.io/gorm"
 )
 
-func SaveCate(category models.Category) (models.Category, error) {
-	result := config.GetDB().Save(&category)
+type category struct {
+	db *gorm.DB
+}
+
+type Category interface {
+	Save(category models.Category) (models.Category, error)
+	FindOne(id uint) (models.Category, error)
+	FindOneByName(name string) ([]models.Category, error)
+	FindAll() []models.Category
+	FindPage(pageable pagination.Pageable) page.Page
+	Delete(category models.Category) error
+}
+
+func NewCategory(db *gorm.DB) Category {
+	return &category{db: db}
+}
+
+func (r *category) Save(category models.Category) (models.Category, error) {
+	result := r.db.Save(&category)
 	if result.Error != nil {
 		return category, result.Error
 	}
 	return category, nil
 }
 
-func FindOneCate(id uint) (models.Category, error) {
+func (r *category) FindOne(id uint) (models.Category, error) {
 	var category models.Category
 
 	// key := "CATE_" + converter.ToStr(id)
@@ -28,7 +46,7 @@ func FindOneCate(id uint) (models.Category, error) {
 	// 	logging.Info("FindOneCate", err)
 	// }
 
-	result := config.GetDB().First(&category, id)
+	result := r.db.First(&category, id)
 	if result.Error != nil {
 		return models.Category{}, result.Error
 	}
@@ -37,44 +55,44 @@ func FindOneCate(id uint) (models.Category, error) {
 	return category, nil
 }
 
-func FindOneCateByName(name string) ([]models.Category, error) {
+func (r *category) FindOneByName(name string) ([]models.Category, error) {
 	var categories []models.Category
-	result := config.GetDB().Where("name LIKE ?", "%" + name + "%").Find(&categories)
+	result := r.db.Where("name LIKE ?", "%" + name + "%").Find(&categories)
 	if result.Error != nil {
 		return []models.Category{}, result.Error
 	}
 	return categories, nil
 }
 
-func FindAllCate() []models.Category {
+func (r *category) FindAll() []models.Category {
 	var categories []models.Category
-	config.GetDB().Find(&categories)
+	r.db.Find(&categories)
 	return categories
 }
 
-func FindPageCate(pageable pagination.Pageable) page.Page {
+func (r *category) FindPage(pageable pagination.Pageable) page.Page {
 	var categories []models.Category
 
 	paginator := pagination.Paging(&pagination.Param{
-        DB:      config.GetDB().Preload("Recipes"),
+        DB:      r.db.Preload("Recipes"),
         Page:    pageable.GetPageNumber(),
         Limit:   pageable.GetPageSize(),
         OrderBy: []string{"id desc"},
         ShowSQL: true,
 	}, &categories)
 
-	return page.From(toInterfacesFromCategories(categories), paginator.TotalRecord)
+	return page.From(r.toInterfacesFromCategories(categories), paginator.TotalRecord)
 }
 
-func DeleteCate(category models.Category) error {
-	result := config.GetDB().Delete(&category)
+func (r *category) Delete(category models.Category) error {
+	result := r.db.Delete(&category)
 	if result.Error != nil {
 		return result.Error
 	}
 	return nil
 }
 
-func toInterfacesFromCategories(categories []models.Category) []interface{} {
+func (r *category) toInterfacesFromCategories(categories []models.Category) []interface{} {
 	content := make([]interface{}, len(categories))
 	for i, v := range categories {
 		content[i] = v

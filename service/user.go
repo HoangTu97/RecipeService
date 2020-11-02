@@ -10,7 +10,21 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func CreateUser(userDTO dto.UserDTO) (dto.UserDTO, bool) {
+type User interface {
+	Create(userDTO dto.UserDTO) (dto.UserDTO, bool)
+	FindOneLogin(username string, password string) (dto.UserDTO, bool)
+	FindOneByUserID(userId string) (dto.UserDTO, bool)
+}
+
+type user struct {
+	repository repository.User
+}
+
+func NewUser(repository repository.User) User {
+	return &user{repository: repository}
+}
+
+func (s *user) Create(userDTO dto.UserDTO) (dto.UserDTO, bool) {
 	pass, err := bcrypt.GenerateFromPassword([]byte(userDTO.Password), bcrypt.DefaultCost)
 	if err != nil {
 		logging.Error(err)
@@ -20,13 +34,13 @@ func CreateUser(userDTO dto.UserDTO) (dto.UserDTO, bool) {
 	userDTO.Roles = append(userDTO.Roles, domain.ROLE_USER)
 
 	user := mapper.ToUser(userDTO)
-	repository.SaveUser(user)
+	s.repository.Save(user)
 
 	return mapper.ToUserDTO(user), true
 }
 
-func FindOneUserLogin(username string, password string) (dto.UserDTO, bool) {
-	user, err := repository.FindOneUserByName(username)
+func (s *user) FindOneLogin(username string, password string) (dto.UserDTO, bool) {
+	user, err := s.repository.FindOneByName(username)
 	if err != nil {
 		return dto.UserDTO{}, false
 	}
@@ -39,8 +53,8 @@ func FindOneUserLogin(username string, password string) (dto.UserDTO, bool) {
 	return mapper.ToUserDTO(user), true
 }
 
-func FindOneUserByUserID(userId string) (dto.UserDTO, bool) {
-	user, err := repository.FineOneUserByUserId(userId)
+func (s *user) FindOneByUserID(userId string) (dto.UserDTO, bool) {
+	user, err := s.repository.FineOneByUserId(userId)
 	if err != nil {
 		return dto.UserDTO{}, false
 	}

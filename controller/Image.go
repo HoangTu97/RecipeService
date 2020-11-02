@@ -1,4 +1,4 @@
-package imageresource
+package controller
 
 import (
 	"Food/dto/response"
@@ -14,6 +14,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Image interface {
+	Upload(c *gin.Context)
+	Download(c *gin.Context)
+	FileDisplay(c *gin.Context)
+}
+
+type image struct {
+}
+
+func NewImage() Image {
+	return &image{}
+}
+
 // Upload upload image
 // @Summary Upload
 // @Tags PublicImage
@@ -21,7 +34,7 @@ import (
 // @Param file formData file true "Body with file"
 // @Success 200 {object} response.APIResponseDTO{data=string} "desc"
 // @Router /api/public/image/upload [post]
-func Upload(c *gin.Context) {
+func (r *image) Upload(c *gin.Context) {
 	// Source
 	file, err := c.FormFile("file")
 	if err != nil {
@@ -50,7 +63,7 @@ func Upload(c *gin.Context) {
 // @Produce octet-stream
 // @Param id path string true "Image id"
 // @Router /api/public/image/{id}/download [get]
-func Download(c *gin.Context) {
+func (r *image) Download(c *gin.Context) {
 	filename := converter.MustString(c.Param("id"))
 
 	filePath := service.GetFilePath(filename)
@@ -67,7 +80,7 @@ func Download(c *gin.Context) {
 // @Produce octet-stream
 // @Param id path string true "Image id"
 // @Router /api/public/image/{id} [get]
-func FileDisplay(c *gin.Context) {
+func (r *image) FileDisplay(c *gin.Context) {
 	filename := converter.MustString(c.Param("id"))
 
 	filePath := service.GetFilePath(filename)

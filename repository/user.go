@@ -1,27 +1,42 @@
 package repository
 
 import (
-	"Food/config"
 	"Food/models"
+
+	"gorm.io/gorm"
 )
 
-func SaveUser(user models.User) models.User {
-	config.GetDB().Create(&user)
+type user struct {
+	db *gorm.DB
+}
+
+type User interface {
+	Save(user models.User) models.User
+	FineOneByUserId(userId string) (models.User, error)
+	FindOneByName(name string) (models.User, error)
+}
+
+func NewUser(db *gorm.DB) User {
+	return &user{ db: db}
+}
+
+func (r *user) Save(user models.User) models.User {
+	r.db.Create(&user)
 	return user
 }
 
-func FineOneUserByUserId(userId string) (models.User, error) {
+func (r *user) FineOneByUserId(userId string) (models.User, error) {
 	user := models.User{}
-	result := config.GetDB().Where("user_id = ?", userId).First(&user)
+	result := r.db.Where("user_id = ?", userId).First(&user)
 	if result.Error != nil {
 		return models.User{}, result.Error
 	}
 	return user, nil
 }
 
-func FindOneUserByName(name string) (models.User, error) {
+func (r *user) FindOneByName(name string) (models.User, error) {
 	user := models.User{}
-	result := config.GetDB().Where("name = ?", name).First(&user)
+	result := r.db.Where("name = ?", name).First(&user)
 	if result.Error != nil {
 		return models.User{}, result.Error
 	}

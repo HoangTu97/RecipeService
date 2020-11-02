@@ -1,22 +1,39 @@
 package repository
 
 import (
-	"Food/config"
 	"Food/models"
+
+	"gorm.io/gorm"
 )
 
-func SaveUserRecipeInteraction(interaction models.UserRecipeInteraction) (models.UserRecipeInteraction, error) {
-	result := config.GetDB().Save(&interaction)
+type user_recipe_interaction struct {
+	db *gorm.DB
+}
+
+type UserRecipeInteraction interface {
+	Save(interaction models.UserRecipeInteraction) (models.UserRecipeInteraction, error)
+	FindOne(id uint) (models.UserRecipeInteraction, error)
+	FindOneByUserIdAndRecipeId(userId uint, recipeId uint) (models.UserRecipeInteraction, error)
+	FindAll() []models.UserRecipeInteraction
+	Delete(interaction models.UserRecipeInteraction) error
+}
+
+func NewUserRecipeInteraction(db *gorm.DB) UserRecipeInteraction {
+	return &user_recipe_interaction{db: db}
+}
+
+func (r *user_recipe_interaction) Save(interaction models.UserRecipeInteraction) (models.UserRecipeInteraction, error) {
+	result := r.db.Save(&interaction)
 	if result.Error != nil {
 		return models.UserRecipeInteraction{}, result.Error
 	}
 	return interaction, nil
 }
 
-func FindOneUserRecipeInteraction(id uint) (models.UserRecipeInteraction, error) {
+func (r *user_recipe_interaction) FindOne(id uint) (models.UserRecipeInteraction, error) {
 	var interaction models.UserRecipeInteraction
 
-	result := config.GetDB().First(&interaction, id)
+	result := r.db.First(&interaction, id)
 	if result.Error != nil {
 		return models.UserRecipeInteraction{}, result.Error
 	}
@@ -25,23 +42,23 @@ func FindOneUserRecipeInteraction(id uint) (models.UserRecipeInteraction, error)
 	return interaction, nil
 }
 
-func FindOneUserRecipeInteractionByUserIdAndRecipeId(userId uint, recipeId uint) (models.UserRecipeInteraction, error) {
+func (r *user_recipe_interaction) FindOneByUserIdAndRecipeId(userId uint, recipeId uint) (models.UserRecipeInteraction, error) {
 	var interaction models.UserRecipeInteraction
-	result := config.GetDB().Where("user_id = ? AND recipe_id = ?", userId, recipeId).First(&interaction)
+	result := r.db.Where("user_id = ? AND recipe_id = ?", userId, recipeId).First(&interaction)
 	if result.Error != nil {
 		return models.UserRecipeInteraction{}, result.Error
 	}
 	return interaction, nil
 }
 
-func FindAllUserRecipeInteraction() []models.UserRecipeInteraction {
+func (r *user_recipe_interaction) FindAll() []models.UserRecipeInteraction {
 	var interactions []models.UserRecipeInteraction
-	config.GetDB().Find(&interactions)
+	r.db.Find(&interactions)
 	return interactions
 }
 
-func DeleteUserRecipeInteraction(interaction models.UserRecipeInteraction) error {
-	result := config.GetDB().Delete(&interaction)
+func (r *user_recipe_interaction) Delete(interaction models.UserRecipeInteraction) error {
+	result := r.db.Delete(&interaction)
 	if result.Error != nil {
 		return result.Error
 	}

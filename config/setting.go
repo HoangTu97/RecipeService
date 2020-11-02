@@ -1,61 +1,18 @@
 package config
 
 import (
+	"Food/helpers/setting"
 	"log"
 	"time"
 
 	"github.com/go-ini/ini"
 )
 
-type App struct {
-	JwtSecret       string
-	PageSize        int
-	RuntimeRootPath string
-	LogSavePath     string
-	LogSaveName     string
-	LogFileExt      string
-	TimeFormat      string
-}
-
-type Server struct {
-	RunMode      string
-	HTTPPort     string
-	SSL          bool
-	ReadTimeout  time.Duration
-	WriteTimeout time.Duration
-}
-
-type Database struct {
-	Host     string
-	Port     string
-	Type     string
-	Name     string
-	User     string
-	Password string
-}
-
-type Redis struct {
-	Host        string
-	Port        string
-	Password    string
-	SSL         bool
-	MaxIdle     int
-	MaxActive   int
-	IdleTimeout time.Duration
-}
-
-type RabbitMQ struct {
-	Host     string
-	Port     string
-	User     string
-	Password string
-}
-
-var AppSetting = &App{}
-var ServerSetting = &Server{}
-var DatabaseSetting = &Database{}
-var RedisSetting = &Redis{}
-var RabbitMQSetting = &RabbitMQ{}
+var AppSetting = &setting.App{}
+var ServerSetting = &setting.Server{}
+var DatabaseSetting = &setting.Database{}
+var RedisSetting = &setting.Redis{}
+var RabbitMQSetting = &setting.RabbitMQ{}
 
 var cfg *ini.File
 

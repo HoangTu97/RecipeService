@@ -16,10 +16,11 @@ import (
 
 func init() {
 	config.Setup()
+	logging.Setup(*config.AppSetting)
+	gredis.Setup(*config.RedisSetting)
+	jwt.Setup(*config.AppSetting)
 	config.SetupDB()
-	logging.Setup()
-	gredis.Setup()
-	jwt.Setup()
+	config.SetupDI()
 }
 
 // @title Food API

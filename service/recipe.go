@@ -9,10 +9,32 @@ import (
 	"Food/service/mapper"
 )
 
-func SaveRecipe(recipeDTO dto.RecipeDTO) (dto.RecipeDTO, bool) {
+type Recipe interface {
+	Save(recipeDTO dto.RecipeDTO) (dto.RecipeDTO, bool)
+	FindPageByCateID(cateID uint, pageable pagination.Pageable) page.Page
+	FindPageByCates(cates []models.Category, pageable pagination.Pageable) page.Page
+	FindPageByName(name string, pageable pagination.Pageable) page.Page
+	FindPageByIngredientID(ingredientID uint, pageable pagination.Pageable) page.Page
+	FindPageByIngredientIDIn(ingredientIDs []uint, pageable pagination.Pageable) page.Page
+	FindPage(pageable pagination.Pageable) page.Page
+	FindIDsByName(name string) []uint
+	FindOne(id uint) (dto.RecipeDTO, bool)
+	FindOneWithCate(id uint) (models.Recipe, bool)
+	CountByCateID(cateID uint) int64
+}
+
+type recipe struct {
+	repository repository.Recipe
+}
+
+func NewRecipe(repository repository.Recipe) Recipe {
+	return &recipe{repository: repository}
+}
+
+func (s *recipe) Save(recipeDTO dto.RecipeDTO) (dto.RecipeDTO, bool) {
 	recipe := mapper.ToRecipe(recipeDTO)
 	var err error
-	recipe, err = repository.SaveRecipe(recipe)
+	recipe, err = s.repository.Save(recipe)
 	if err != nil {
 		return recipeDTO, false
 	}
@@ -20,32 +42,32 @@ func SaveRecipe(recipeDTO dto.RecipeDTO) (dto.RecipeDTO, bool) {
 }
 
 // FindPageByCateID return page models.Recipe
-func FindPageRecipeByCateID(cateID uint, pageable pagination.Pageable) page.Page {
-	return repository.FindPageRecipeByCateID(cateID, pageable)
+func (s *recipe) FindPageByCateID(cateID uint, pageable pagination.Pageable) page.Page {
+	return s.repository.FindPageByCateID(cateID, pageable)
 }
 
-func FindPageRecipeByCates(cates []models.Category, pageable pagination.Pageable) page.Page {
-	return repository.FindPageRecipeByCates(cates, pageable)
+func (s *recipe) FindPageByCates(cates []models.Category, pageable pagination.Pageable) page.Page {
+	return s.repository.FindPageByCates(cates, pageable)
 }
 
-func FindPageRecipeByName(name string, pageable pagination.Pageable) page.Page {
-	return repository.FindPageRecipeByName(name, pageable)
+func (s *recipe) FindPageByName(name string, pageable pagination.Pageable) page.Page {
+	return s.repository.FindPageByName(name, pageable)
 }
 
-func FindPageRecipeByIngredientID(ingredientID uint, pageable pagination.Pageable) page.Page {
-	return repository.FindPageRecipeByIngredientID(ingredientID, pageable)
+func (s *recipe) FindPageByIngredientID(ingredientID uint, pageable pagination.Pageable) page.Page {
+	return s.repository.FindPageByIngredientID(ingredientID, pageable)
 }
 
-func FindPageRecipeByIngredientIDIn(ingredientIDs []uint, pageable pagination.Pageable) page.Page {
-	return repository.FindPageRecipeByIngredientIDIn(ingredientIDs, pageable)
+func (s *recipe) FindPageByIngredientIDIn(ingredientIDs []uint, pageable pagination.Pageable) page.Page {
+	return s.repository.FindPageByIngredientIDIn(ingredientIDs, pageable)
 }
 
-func FindPageRecipe(pageable pagination.Pageable) page.Page {
-	return repository.FindPageRecipe(pageable)
+func (s *recipe) FindPage(pageable pagination.Pageable) page.Page {
+	return s.repository.FindPage(pageable)
 }
 
-func FindRecipeIDsByName(name string) []uint {
-	recipes := repository.FindRecipeByName(name)
+func (s *recipe) FindIDsByName(name string) []uint {
+	recipes := s.repository.FindByName(name)
 	ids := make([]uint, len(recipes))
 	for i, v := range recipes {
 		ids[i] = v.ID
@@ -53,22 +75,22 @@ func FindRecipeIDsByName(name string) []uint {
 	return ids
 }
 
-func FindOneRecipe(id uint) (dto.RecipeDTO, bool) {
-	recipe, err := repository.FindOneRecipe(id)
+func (s *recipe) FindOne(id uint) (dto.RecipeDTO, bool) {
+	recipe, err := s.repository.FindOne(id)
 	if err != nil {
 		return dto.RecipeDTO{}, false
 	}
 	return mapper.ToRecipeDTO(recipe), true
 }
 
-func FindOneRecipeWithCate(id uint) (models.Recipe, bool) {
-	recipe, err := repository.FindOneRecipePreloadCate(id)
+func (s *recipe) FindOneWithCate(id uint) (models.Recipe, bool) {
+	recipe, err := s.repository.FindOnePreloadCate(id)
 	if err != nil {
 		return models.Recipe{}, false
 	}
 	return recipe, true
 }
 
-func CountRecipeByCateID(cateID uint) int64 {
-	return repository.CountRecipeByCateID(cateID)
+func (s *recipe) CountByCateID(cateID uint) int64 {
+	return s.repository.CountByCateID(cateID)
 }

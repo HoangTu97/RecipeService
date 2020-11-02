@@ -1,21 +1,20 @@
 package logging
 
 import (
-	"Food/config"
 	"fmt"
 	"time"
 )
 
 // getLogFilePath get the log file save path
-func getLogFilePath() string {
-	return fmt.Sprintf("%s%s", config.AppSetting.RuntimeRootPath, config.AppSetting.LogSavePath)
+func getLogFilePath(runtimeRootPath string, logSavePath string) string {
+	return fmt.Sprintf("%s%s", runtimeRootPath, logSavePath)
 }
 
 // getLogFileName get the save name of the log file
-func getLogFileName() string {
+func getLogFileName(logSaveName string, timeFormat string, logFileExt string) string {
 	return fmt.Sprintf("%s%s.%s",
-		config.AppSetting.LogSaveName,
-		time.Now().Format(config.AppSetting.TimeFormat),
-		config.AppSetting.LogFileExt,
+		logSaveName,
+		time.Now().Format(timeFormat),
+		logFileExt,
 	)
 }

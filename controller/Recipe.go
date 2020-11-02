@@ -1,14 +1,39 @@
-package reciperesource
+package controller
 
 import (
 	"Food/dto/response"
-	"Food/dto/response/recipe"
+	RecipeResponse "Food/dto/response/recipe"
 	"Food/helpers/converter"
 	"Food/helpers/pagination"
 	"Food/service"
 
 	"github.com/gin-gonic/gin"
 )
+
+type Recipe interface {
+	GetByCategory(c *gin.Context)
+	GetCountByCategory(c *gin.Context)
+	GetByCategoryName(c *gin.Context)
+	GetByIngredient(c *gin.Context)
+	GetByIngredientName(c *gin.Context)
+	GetByRecipeName(c *gin.Context)
+	GetAll(c *gin.Context)
+	GetDetailByID(c *gin.Context)
+}
+
+type recipe struct {
+	service service.Recipe
+	cateService service.Category
+	ingreService service.Ingredient
+}
+
+func NewRecipe(service service.Recipe, cateService service.Category, ingreService service.Ingredient) Recipe {
+	return &recipe{
+		service: service, 
+		cateService: cateService,
+		ingreService: ingreService,
+	}
+}
 
 // Recipe GetByCategory
 // @Summary GetByCategory
@@ -19,19 +44,19 @@ import (
 // @Param categoryId path int true "categoryId"
 // @Success 200 {object} response.APIResponseDTO{data=recipe.RecipeListResponseDTO} "desc"
 // @Router /api/public/recipe/getByCategory/:categoryId [get]
-func GetByCategory(c *gin.Context) {
+func (r *recipe) GetByCategory(c *gin.Context) {
 	pageable := pagination.GetPage(c)
 	id := converter.MustUint(c.Param("categoryId"))
 
-	_, isExist := service.FindOneCate(id)
+	_, isExist := r.cateService.FindOne(id)
 	if !isExist {
 		response.CreateErrorResponse(c, "CATEGORY_NOT_FOUND")
 		return
 	}
 
-	page := service.FindPageRecipeByCateID(id, pageable)
+	page := r.service.FindPageByCateID(id, pageable)
 
-	response.CreateSuccesResponse(c, recipe.CreateRecipeListResponseDTOFromPage(page))
+	response.CreateSuccesResponse(c, RecipeResponse.CreateRecipeListResponseDTOFromPage(page))
 }
 
 // Recipe GetCountByCategory
@@ -41,64 +66,64 @@ func GetByCategory(c *gin.Context) {
 // @Param categoryId path int true "categoryId"
 // @Success 200 {object} response.APIResponseDTO{data=recipe.RecipeCountByCateResponseDTO} "desc"
 // @Router /api/public/recipe/countByCategory/:categoryId [get]
-func GetCountByCategory(c *gin.Context) {
+func (r *recipe) GetCountByCategory(c *gin.Context) {
 	id := converter.MustUint(c.Param("categoryId"))
 
-	_, isExist := service.FindOneCate(id)
+	_, isExist := r.cateService.FindOne(id)
 	if !isExist {
 		response.CreateErrorResponse(c, "CATEGORY_NOT_FOUND")
 		return
 	}
 
-	result := service.CountRecipeByCateID(id)
-	response.CreateSuccesResponse(c, &recipe.RecipeCountByCateResponseDTO{
+	result := r.service.CountByCateID(id)
+	response.CreateSuccesResponse(c, &RecipeResponse.RecipeCountByCateResponseDTO{
 		Value: result,
 	})
 }
 
-func GetByCategoryName(c *gin.Context) {
+func (r *recipe) GetByCategoryName(c *gin.Context) {
 	pageable := pagination.GetPage(c)
 	cateName := converter.MustString(c.Query("name"))
 
-	cates, isExist := service.FindCateByName(cateName)
+	cates, isExist := r.cateService.FindByName(cateName)
 	if !isExist {
 		response.CreateErrorResponse(c, "CATEGORY_NOT_FOUND")
 		return
 	}
 
-	page := service.FindPageRecipeByCates(cates, pageable)
+	page := r.service.FindPageByCates(cates, pageable)
 
-	response.CreateSuccesResponse(c, recipe.CreateRecipeListResponseDTOFromPage(page))
+	response.CreateSuccesResponse(c, RecipeResponse.CreateRecipeListResponseDTOFromPage(page))
 }
 
-func GetByIngredient(c *gin.Context) {
+func (r *recipe) GetByIngredient(c *gin.Context) {
 	pageable := pagination.GetPage(c)
 	id := converter.MustUint(c.Param("ingredientId"))
 
-	_, isExist := service.FindOneIngredientDTO(id)
+	_, isExist := r.ingreService.FindOneDTO(id)
 	if !isExist {
 		response.CreateErrorResponse(c, "INGREDIENT_NOT_FOUND")
 		return
 	}
 
-	page := service.FindPageRecipeByIngredientID(id, pageable)
+	page := r.service.FindPageByIngredientID(id, pageable)
 
-	response.CreateSuccesResponse(c, recipe.CreateRecipeListResponseDTOFromPage(page))
+	response.CreateSuccesResponse(c, RecipeResponse.CreateRecipeListResponseDTOFromPage(page))
 }
 
-func GetByIngredientName(c *gin.Context) {
+func (r *recipe) GetByIngredientName(c *gin.Context) {
 	pageable := pagination.GetPage(c)
 	ingredientName := converter.MustString(c.Query("name"))
 
-	ingredientIDs := service.FindIngredientIDsByName(ingredientName)
+	ingredientIDs := r.ingreService.FindIDsByName(ingredientName)
 	if len(ingredientIDs) == 0 {
 		response.CreateErrorResponse(c, "INGREDIENT_NOT_FOUND")
 		return
 	}
 
-	page := service.FindPageRecipeByIngredientIDIn(ingredientIDs, pageable)
+	page := r.service.FindPageByIngredientIDIn(ingredientIDs, pageable)
 
-	response.CreateSuccesResponse(c, recipe.CreateRecipeListResponseDTOFromPage(page))
+	response.CreateSuccesResponse(c, RecipeResponse.CreateRecipeListResponseDTOFromPage(page))
 }
 
 // Recipe getByRecipeName
@@ -110,13 +135,13 @@ func GetByIngredientName(c *gin.Context) {
 // @Param name query string true "name"
 // @Success 200 {object} response.APIResponseDTO{data=recipe.RecipeListResponseDTO} "desc"
 // @Router /api/public/recipe/searchByRecipeName [get]
-func GetByRecipeName(c *gin.Context) {
+func (r *recipe) GetByRecipeName(c *gin.Context) {
 	pageable := pagination.GetPage(c)
 	recipeName := converter.MustString(c.Query("name"))
 
-	page := service.FindPageRecipeByName(recipeName, pageable)
+	page := r.service.FindPageByName(recipeName, pageable)
 
-	response.CreateSuccesResponse(c, recipe.CreateRecipeListResponseDTOFromPage(page))
+	response.CreateSuccesResponse(c, RecipeResponse.CreateRecipeListResponseDTOFromPage(page))
 }
 
 // Recipe all
@@ -127,12 +152,12 @@ func GetByRecipeName(c *gin.Context) {
 // @Param size query int false "size"
 // @Success 200 {object} response.APIResponseDTO{data=recipe.RecipeListResponseDTO} "desc"
 // @Router /api/public/recipe/getAll [get]
-func GetAll(c *gin.Context) {
+func (r *recipe) GetAll(c *gin.Context) {
 	pageable := pagination.GetPage(c)
 
-	page := service.FindPageRecipe(pageable)
+	page := r.service.FindPage(pageable)
 
-	response.CreateSuccesResponse(c, recipe.CreateRecipeListResponseDTOFromPage(page))
+	response.CreateSuccesResponse(c, RecipeResponse.CreateRecipeListResponseDTOFromPage(page))
 }
 
 // Recipe getDetailByID
@@ -142,14 +167,14 @@ func GetAll(c *gin.Context) {
 // @Param id path int true "id"
 // @Success 200 {object} response.APIResponseDTO{data=recipe.RecipeDetailResponseDTO} "desc"
 // @Router /api/public/recipe/detail/:id [get]
-func GetDetailByID(c *gin.Context) {
+func (r *recipe) GetDetailByID(c *gin.Context) {
 	id := converter.MustUint(c.Param("id"))
 
-	recipeData, isExist := service.FindOneRecipeWithCate(id)
+	recipeData, isExist := r.service.FindOneWithCate(id)
 	if !isExist {
 		response.CreateErrorResponse(c, "RECIPE_NOT_FOUND")
 		return
 	}
 
-	response.CreateSuccesResponse(c, recipe.CreateRecipeDetailResponseDTO(recipeData))
+	response.CreateSuccesResponse(c, RecipeResponse.CreateRecipeDetailResponseDTO(recipeData))
 }

@@ -5,10 +5,23 @@ import (
 	"Food/repository"
 )
 
-func FindRecipeIngredientsByRecipeIDs(recipeIDs []uint) []models.RecipeIngredients {
-	return repository.FindRecipeIngredientsByRecipeIDs(recipeIDs)
+type RecipeIngredients interface {
+	FindByRecipeIDs(recipeIDs []uint) []models.RecipeIngredients
+	FindByRecipeID(recipeID uint) []models.RecipeIngredients
 }
 
-func FindRecipeIngredientsByRecipeID(recipeID uint) []models.RecipeIngredients {
-	return repository.FindRecipeIngredientsByRecipeID(recipeID)
+type recipe_ingredients struct {
+	repository repository.RecipeIngredients
+}
+
+func NewRecipeIngredients(repository repository.RecipeIngredients) RecipeIngredients {
+	return &recipe_ingredients{repository: repository}
+}
+
+func (s *recipe_ingredients) FindByRecipeIDs(recipeIDs []uint) []models.RecipeIngredients {
+	return s.repository.FindByRecipeIDs(recipeIDs)
+}
+
+func (s *recipe_ingredients) FindByRecipeID(recipeID uint) []models.RecipeIngredients {
+	return s.repository.FindByRecipeID(recipeID)
 }

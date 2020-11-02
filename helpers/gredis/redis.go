@@ -1,42 +1,12 @@
 package gredis
 
 import (
-	"Food/config"
 	"encoding/json"
-	"time"
 
 	"github.com/gomodule/redigo/redis"
 )
 
 var RedisConn *redis.Pool
-
-// Setup Initialize the Redis instance
-func Setup() error {
-	RedisConn = &redis.Pool{
-		MaxIdle:     config.RedisSetting.MaxIdle,
-		MaxActive:   config.RedisSetting.MaxActive,
-		IdleTimeout: config.RedisSetting.IdleTimeout,
-		Dial: func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", config.RedisSetting.Host)
-			if err != nil {
-				return nil, err
-			}
-			if config.RedisSetting.Password != "" {
-				if _, err := c.Do("AUTH", config.RedisSetting.Password); err != nil {
-					c.Close()
-					return nil, err
-				}
-			}
-			return c, err
-		},
-		TestOnBorrow: func(c redis.Conn, t time.Time) error {
-			_, err := c.Do("PING")
-			return err
-		},
-	}
-
-	return nil
-}
 
 // Set a key/value
 func Set(key string, data interface{}, time int) error {

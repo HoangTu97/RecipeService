@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"Food/config"
 	"Food/helpers/converter"
 	"Food/helpers/gredis"
 	"Food/helpers/logging"
@@ -9,17 +8,33 @@ import (
 	"Food/helpers/pagination"
 	"Food/models"
 	"encoding/json"
+
+	"gorm.io/gorm"
 )
 
-func SavePost(post models.Post) (models.Post, error) {
-	result := config.GetDB().Save(&post)
+type post struct {
+	db *gorm.DB
+}
+
+type Post interface {
+	Save(post models.Post) (models.Post, error)
+	FindOne(id uint) (models.Post, error)
+	FindPage(pageable pagination.Pageable) page.Page
+}
+
+func NewPost(db *gorm.DB) Post {
+	return &post{db: db}
+}
+
+func (r *post) Save(post models.Post) (models.Post, error) {
+	result := r.db.Save(&post)
 	if result.Error != nil {
 		return post, result.Error
 	}
 	return post, nil
 }
 
-func FindOnePost(id uint) (models.Post, error) {
+func (r *post) FindOne(id uint) (models.Post, error) {
 	var post models.Post
 
 	key := "POST_" + converter.ToStr(id)
@@ -33,7 +48,7 @@ func FindOnePost(id uint) (models.Post, error) {
 		return post, nil
 	}
 
-	result := config.GetDB().First(&post, id)
+	result := r.db.First(&post, id)
 	if result.Error != nil {
 		return models.Post{}, result.Error
 	}
@@ -42,20 +57,20 @@ func FindOnePost(id uint) (models.Post, error) {
 	return post, nil
 }
 
-func FindPagePost(pageable pagination.Pageable) page.Page {
+func (r *post) FindPage(pageable pagination.Pageable) page.Page {
 	var posts []models.Post
 
 	paginator := pagination.Paging(&pagination.Param{
-        DB:      config.GetDB().Joins("User").Joins("Recipe"),
+        DB:      r.db.Joins("User").Joins("Recipe"),
         Page:    pageable.GetPageNumber(),
         Limit:   pageable.GetPageSize(),
         ShowSQL: true,
 	}, &posts)
 
-	return page.From(toInterfacesFromPost(posts), paginator.TotalRecord)
+	return page.From(r.toInterfacesFromPost(posts), paginator.TotalRecord)
 }
 
-func toInterfacesFromPost(posts []models.Post) []interface{} {
+func (r *post) toInterfacesFromPost(posts []models.Post) []interface{} {
 	content := make([]interface{}, len(posts))
 	for i, v := range posts {
 		content[i] = v

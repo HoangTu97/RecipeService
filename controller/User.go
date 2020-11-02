@@ -1,11 +1,11 @@
-package userresource
+package controller
 
 import (
 	"Food/dto"
 	"Food/dto/request"
-	RequestUser "Food/dto/request/user"
+	UserRequest "Food/dto/request/user"
 	"Food/dto/response"
-	"Food/dto/response/user"
+	UserResponse "Food/dto/response/user"
 	"Food/helpers/e"
 	"Food/helpers/jwt"
 	"Food/helpers/logging"
@@ -14,6 +14,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type User interface {
+	Register(c *gin.Context)
+	Login(c *gin.Context)
+}
+
+type user struct {
+	service service.User
+}
+
+func NewUser(service service.User) User {
+	return &user{service: service}
+}
+
 // Register register
 // @Summary Register
 // @Tags PublicUser
@@ -21,8 +34,8 @@ import (
 // @Param RegisterDTO body requestuser.RegisterDTO true "RegisterDTO"
 // @Success 200 {object} response.APIResponseDTO "desc"
 // @Router /api/public/user/register [post]
-func Register(c *gin.Context) {
-	var registerDTO RequestUser.RegisterDTO
+func (r *user) Register(c *gin.Context) {
+	var registerDTO UserRequest.RegisterDTO
 	errCode := request.BindAndValid(c, &registerDTO)
 	if errCode != e.SUCCESS {
 		response.CreateErrorResponse(c, e.GetMsg(errCode))
@@ -31,7 +44,7 @@ func Register(c *gin.Context) {
 
 	userDTO := dto.UserDTO{Name: registerDTO.Username, Password: registerDTO.Password}
 
-	_, isSuccess := service.CreateUser(userDTO)
+	_, isSuccess := r.service.Create(userDTO)
 	if !isSuccess {
 		response.CreateErrorResponse(c, "Register failed!!!")
 		return
@@ -47,15 +60,15 @@ func Register(c *gin.Context) {
 // @Param LoginDTO body requestuser.LoginDTO true "LoginDTO"
 // @Success 200 {object} response.APIResponseDTO "desc"
 // @Router /api/public/user/login [post]
-func Login(c *gin.Context) {
-	var loginDTO RequestUser.LoginDTO
+func (r *user) Login(c *gin.Context) {
+	var loginDTO UserRequest.LoginDTO
 	errCode := request.BindAndValid(c, &loginDTO)
 	if errCode != e.SUCCESS {
 		response.CreateErrorResponse(c, e.GetMsg(errCode))
 		return
 	}
 
-	userDTO, isSuccess := service.FindOneUserLogin(loginDTO.Username, loginDTO.Password)
+	userDTO, isSuccess := r.service.FindOneLogin(loginDTO.Username, loginDTO.Password)
 	if !isSuccess {
 		response.CreateErrorResponse(c, "UNAUTHORIZED")
 		return
@@ -66,7 +79,7 @@ func Login(c *gin.Context) {
 		logging.Error("Signed token error: ", error)
 	}
 
-	response.CreateSuccesResponse(c, user.LoginResponseDTO{
+	response.CreateSuccesResponse(c, UserResponse.LoginResponseDTO{
 		Token: tokenString,
 	})
 }

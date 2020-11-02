@@ -8,24 +8,38 @@ import (
 	"Food/service/mapper"
 )
 
-func SavePost(postDTO dto.PostDTO) (dto.PostDTO, bool) {
+type Post interface {
+	Save(postDTO dto.PostDTO) (dto.PostDTO, bool)
+	FindOne(id uint) (dto.PostDTO, bool)
+	FindPage(pageable pagination.Pageable) page.Page
+}
+
+type post struct {
+	repository repository.Post
+}
+
+func NewPost(repository repository.Post) Post {
+	return &post{repository: repository}
+}
+
+func (s *post) Save(postDTO dto.PostDTO) (dto.PostDTO, bool) {
 	post := mapper.ToPost(postDTO)
 	var err error
-	post, err = repository.SavePost(post)
+	post, err = s.repository.Save(post)
 	if err != nil {
 		return postDTO, false
 	}
 	return mapper.ToPostDTO(post), true
 }
 
-func FindOnePost(id uint) (dto.PostDTO, bool) {
-	post, err := repository.FindOnePost(id)
+func (s *post) FindOne(id uint) (dto.PostDTO, bool) {
+	post, err := s.repository.FindOne(id)
 	if err != nil {
 		return dto.PostDTO{}, false
 	}
 	return mapper.ToPostDTO(post), true
 }
 
-func FindPagePost(pageable pagination.Pageable) page.Page {
-	return repository.FindPagePost(pageable)
+func (s *post) FindPage(pageable pagination.Pageable) page.Page {
+	return s.repository.FindPage(pageable)
 }

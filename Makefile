@@ -1,2 +1,2 @@
 dev:
-	swag init && go build . && ./Food
+	swag init && go build -tags=jsoniter . && ./Food
