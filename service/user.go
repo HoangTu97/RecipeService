@@ -3,7 +3,6 @@ package service
 import (
 	"Food/domain"
 	"Food/dto"
-	"Food/helpers/logging"
 	"Food/repository"
 	"Food/service/mapper"
 
@@ -27,7 +26,6 @@ func NewUser(repository repository.User) User {
 func (s *user) Create(userDTO dto.UserDTO) (dto.UserDTO, bool) {
 	pass, err := bcrypt.GenerateFromPassword([]byte(userDTO.Password), bcrypt.DefaultCost)
 	if err != nil {
-		logging.Error(err)
 		return dto.UserDTO{}, false
 	}
 	userDTO.Password = string(pass)

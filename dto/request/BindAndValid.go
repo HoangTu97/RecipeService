@@ -2,7 +2,7 @@ package request
 
 import (
 	"Food/helpers/e"
-	"Food/helpers/logging"
+	"fmt"
 
 	"github.com/astaxie/beego/validation"
 	"github.com/gin-gonic/gin"
@@ -32,8 +32,7 @@ func BindAndValid(c *gin.Context, form interface{}) (int) {
 // MarkErrors logs error logs
 func MarkErrors(errors []*validation.Error) {
 	for _, err := range errors {
-		logging.Info(err.Key, err.Message)
+		// logging.Info(err.Key, err.Message)
+		fmt.Printf("MarkErrors : %v %v", err.Key, err.Message)
 	}
-
-	return
 }

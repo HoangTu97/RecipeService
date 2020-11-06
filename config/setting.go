@@ -9,6 +9,7 @@ import (
 )
 
 var AppSetting = &setting.App{}
+var LoggerSetting = &setting.Logger{}
 var ServerSetting = &setting.Server{}
 var DatabaseSetting = &setting.Database{}
 var RedisSetting = &setting.Redis{}
@@ -25,6 +26,7 @@ func Setup() {
 	}
 
 	mapTo("app", AppSetting)
+	mapTo("logger", LoggerSetting)
 	mapTo("server", ServerSetting)
 	mapTo("database", DatabaseSetting)
 	mapTo("redis", RedisSetting)

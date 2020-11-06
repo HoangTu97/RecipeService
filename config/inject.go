@@ -4,6 +4,8 @@ import (
 	"Food/controller"
 	"Food/repository"
 	"Food/service"
+
+	"gorm.io/gorm"
 )
 
 var (
@@ -16,8 +18,7 @@ var (
 	UserController controller.User
 )
 
-func SetupDI() {
-	db := GetDB()
+func SetupController(db *gorm.DB) {
 
 	cateRepo := repository.NewCategory(db)
 	commentRepo := repository.NewComment(db)

@@ -1,2 +1,5 @@
+build:
+	go build -tags=jsoniter .
+
 dev:
-	swag init && go build -tags=jsoniter . && ./Food
+	swag init && make build && ./Food

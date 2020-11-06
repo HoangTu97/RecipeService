@@ -8,33 +8,25 @@ import (
 	"os"
 	"time"
 
-	"gorm.io/driver/postgres" // postgres
+	// postgres
 	"gorm.io/gorm"
 
 	"Food/helpers/converter"
 	"Food/models"
 )
 
-// DB db instance
-var DB *gorm.DB
+type DB interface {
+	AutoMigrate(dst ...interface{}) error
+}
+
+// // DB db instance
+// var DB *gorm.DB
 
 // Setup initializes the database instance
-func SetupDB() {
-	dialector := postgres.New(postgres.Config{
-		DSN: fmt.Sprintf("host=%s user=%s password=%s dbname=%s ",
-			DatabaseSetting.Host,
-			DatabaseSetting.User,
-			DatabaseSetting.Password,
-			DatabaseSetting.Name),
-	})
-	db, err := gorm.Open(dialector, &gorm.Config{})
-	if err != nil {
-		log.Fatalf("models.Setup err: %v", err)
-	}
-
+func SetupDB(db *gorm.DB) *gorm.DB {
 	sqlDB, errSqlDB := db.DB()
 	if errSqlDB != nil {
-		log.Fatalf("models.Setup db.DB() err: %v", err)
+		log.Fatalf("models.Setup db.DB() err: %v", errSqlDB)
 	}
 
 	sqlDB.SetMaxIdleConns(10)
@@ -44,19 +36,19 @@ func SetupDB() {
 	migrateDB(db)
 	// initDB(db)
 
-	DB = db
+	return db
 }
 
-// CloseDB closes database connection (unnecessary)
-func CloseDB() {
-	sqlDB, _ := DB.DB()
-	defer sqlDB.Close()
-}
+// // CloseDB closes database connection (unnecessary)
+// func CloseDB() {
+// 	sqlDB, _ := DB.DB()
+// 	defer sqlDB.Close()
+// }
 
-// GetDB get connection
-func GetDB() *gorm.DB {
-	return DB
-}
+// // GetDB get connection
+// func GetDB() *gorm.DB {
+// 	return DB
+// }
 
 func migrateDB(db *gorm.DB) {
 	_ = db.AutoMigrate(

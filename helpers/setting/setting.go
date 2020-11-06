@@ -5,6 +5,9 @@ import "time"
 type App struct {
 	JwtSecret       string
 	PageSize        int
+}
+
+type Logger struct {
 	RuntimeRootPath string
 	LogSavePath     string
 	LogSaveName     string

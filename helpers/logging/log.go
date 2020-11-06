@@ -1,9 +1,10 @@
 package logging
 
 import (
+	"Food/helpers/file"
+	"Food/helpers/setting"
 	"fmt"
 	"log"
-	"os"
 	"path/filepath"
 	"runtime"
 )
@@ -11,12 +12,9 @@ import (
 type Level int
 
 var (
-	F *os.File
-
 	DefaultPrefix      = ""
 	DefaultCallerDepth = 2
-
-	logger     *log.Logger
+	
 	logPrefix  = ""
 	levelFlags = []string{"DEBUG", "INFO", "WARN", "ERROR", "FATAL"}
 )
@@ -29,42 +27,67 @@ const (
 	FATAL
 )
 
+type Logger interface {
+	Debug(v ...interface{})
+	Info(v ...interface{})
+	Warn(v ...interface{})
+	Error(v ...interface{})
+	Fatal(v ...interface{})
+}
+
+type logger struct {
+	logger *log.Logger
+}
+
+func NewLogger(appSetting setting.Logger) Logger {
+	filePath := getLogFilePath(appSetting.RuntimeRootPath, appSetting.LogSavePath)
+	fileName := getLogFileName(appSetting.LogSaveName, appSetting.TimeFormat, appSetting.LogFileExt)
+	file, err := file.MustOpen(fileName, filePath)
+	if err != nil {
+		log.Fatalf("logging.Setup err: %v", err)
+	}
+
+	log := log.New(file, DefaultPrefix, log.LstdFlags)
+
+	return &logger{ logger: log }
+}
+
 // Debug output logs at debug level
-func Debug(v ...interface{}) {
-	setPrefix(DEBUG)
-	logger.Println(v...)
+func (log *logger) Debug(v ...interface{}) {
+	log.setPrefix(DEBUG)
+	log.logger.Println(v...)
 	fmt.Println(v...)
 }
 
 // Info output logs at info level
-func Info(v ...interface{}) {
-	setPrefix(INFO)
-	logger.Println(v...)
+func (log *logger) Info(v ...interface{}) {
+	log.setPrefix(INFO)
+	log.logger.Println(v...)
 	fmt.Println(v...)
 }
 
 // Warn output logs at warn level
-func Warn(v ...interface{}) {
-	setPrefix(WARNING)
-	logger.Println(v...)
+func (log *logger) Warn(v ...interface{}) {
+	log.setPrefix(WARNING)
+	log.logger.Println(v...)
 	fmt.Println(v...)
 }
 
 // Error output logs at error level
-func Error(v ...interface{}) {
-	setPrefix(ERROR)
-	logger.Println(v...)
+func (log *logger) Error(v ...interface{}) {
+	log.setPrefix(ERROR)
+	log.logger.Println(v...)
 	fmt.Println(v...)
 }
 
 // Fatal output logs at fatal level
-func Fatal(v ...interface{}) {
-	setPrefix(FATAL)
-	logger.Fatalln(v...)
+func (log *logger) Fatal(v ...interface{}) {
+	log.setPrefix(FATAL)
+	log.logger.Fatalln(v...)
 }
 
 // setPrefix set the prefix of the log output
-func setPrefix(level Level) {
+func (log *logger) setPrefix(level Level) {
 	_, file, line, ok := runtime.Caller(DefaultCallerDepth)
 	if ok {
 		logPrefix = fmt.Sprintf("[%s][%s:%d]", levelFlags[level], filepath.Base(file), line)
@@ -72,5 +95,5 @@ func setPrefix(level Level) {
 		logPrefix = fmt.Sprintf("[%s]", levelFlags[level])
 	}
 
-	logger.SetPrefix(logPrefix)
+	log.logger.SetPrefix(logPrefix)
 }

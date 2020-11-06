@@ -8,7 +8,6 @@ import (
 	UserResponse "Food/dto/response/user"
 	"Food/helpers/e"
 	"Food/helpers/jwt"
-	"Food/helpers/logging"
 	"Food/service"
 
 	"github.com/gin-gonic/gin"
@@ -76,7 +75,8 @@ func (r *user) Login(c *gin.Context) {
 
 	tokenString, error := jwt.GenerateToken(userDTO.UserID, userDTO.Name, userDTO.GetRolesStr())
 	if error != nil {
-		logging.Error("Signed token error: ", error)
+		response.CreateErrorResponse(c, "UNAUTHORIZED")
+		return
 	}
 
 	response.CreateSuccesResponse(c, UserResponse.LoginResponseDTO{

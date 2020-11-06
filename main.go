@@ -8,20 +8,12 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"Food/config"
-	"Food/helpers/gredis"
+	"Food/helpers/cache"
+	"Food/helpers/database"
 	"Food/helpers/jwt"
 	"Food/helpers/logging"
 	"Food/routers"
 )
-
-func init() {
-	config.Setup()
-	logging.Setup(*config.AppSetting)
-	gredis.Setup(*config.RedisSetting)
-	jwt.Setup(*config.AppSetting)
-	config.SetupDB()
-	config.SetupDI()
-}
 
 // @title Food API
 // @version 1.0
@@ -30,6 +22,15 @@ func init() {
 // @in header
 // @name Authorization
 func main() {
+	config.Setup()
+	database, closeDB := database.NewDB(*config.DatabaseSetting)
+	defer closeDB()
+	database = config.SetupDB(database)
+	logging.NewLogger(*config.LoggerSetting)
+	cache.NewRedis(*config.RedisSetting)
+	jwt.Setup(*config.AppSetting)
+	config.SetupController(database)
+
 	gin.SetMode(config.ServerSetting.RunMode)
 
 	routersInit := routers.InitRouter()
@@ -66,5 +67,4 @@ func main() {
 	// 	routersInit.Run(":" + config.ServerSetting.HTTPPort)
 	// }
 
-	config.CloseDB()
 }
