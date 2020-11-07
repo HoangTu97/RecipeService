@@ -39,6 +39,7 @@ func SetupController(db *gorm.DB) {
 
 	cateService := service.NewCategory(cateRepo, cateMapper)
 	commentService := service.NewComment(commentRepo, commentMapper)
+	imageService := service.NewImage()
 	ingreService := service.NewIngredient(ingreRepo, ingredientMapper)
 	postService := service.NewPost(postRepo, postMapper)
 	recipeIngreService := service.NewRecipeIngredients(recipeIngreRepo, recipeIngreMapper)
@@ -48,7 +49,7 @@ func SetupController(db *gorm.DB) {
 
 	CateController = controller.NewCategory(cateService)
 	CommentController = controller.NewComment(commentService, postService)
-	ImageController = controller.NewImage()
+	ImageController = controller.NewImage(imageService)
 	IngredientController = controller.NewIngredient(ingreService, recipeService, recipeIngreService)
 	PostController = controller.NewPost(postService, userService, recipeService)
 	RecipeController = controller.NewRecipe(recipeService, cateService, ingreService)

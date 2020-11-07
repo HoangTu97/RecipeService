@@ -21,10 +21,11 @@ type Image interface {
 }
 
 type image struct {
+	service service.Image
 }
 
-func NewImage() Image {
-	return &image{}
+func NewImage(service service.Image) Image {
+	return &image{service: service}
 }
 
 // Upload upload image
@@ -45,10 +46,10 @@ func (r *image) Upload(c *gin.Context) {
 	// baseFilename := filepath.Base(file.Filename)
 	ext := filepath.Ext(file.Filename)
 
-	filename := service.GenFileBaseFileName(ext)
-	path := service.GetFilePath(filename)
+	filename := r.service.GenFileBaseFileName(ext)
+	path := r.service.GetFilePath(filename)
 
-	_ = fileUtil.MkDir(service.GetFilePathDir(filename))
+	_ = fileUtil.MkDir(r.service.GetFilePathDir(filename))
 	if err := c.SaveUploadedFile(file, path); err != nil {
 		response.CreateErrorResponse(c, err.Error())
 		return
@@ -66,7 +67,7 @@ func (r *image) Upload(c *gin.Context) {
 func (r *image) Download(c *gin.Context) {
 	filename := converter.MustString(c.Param("id"))
 
-	filePath := service.GetFilePath(filename)
+	filePath := r.service.GetFilePath(filename)
 
 	c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
 	// fmt.Sprintf("attachment; filename=%s", filename) Downloaded file renamed
@@ -83,7 +84,7 @@ func (r *image) Download(c *gin.Context) {
 func (r *image) FileDisplay(c *gin.Context) {
 	filename := converter.MustString(c.Param("id"))
 
-	filePath := service.GetFilePath(filename)
+	filePath := r.service.GetFilePath(filename)
 
 	b, err := ioutil.ReadFile(filePath) // just pass the file name
 	if err != nil {
