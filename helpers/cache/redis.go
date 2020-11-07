@@ -1,20 +1,14 @@
 package cache
 
 import (
+	"Food/helpers/converter"
 	"Food/helpers/setting"
 	"encoding/json"
+	"strings"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
 )
-
-type Cache interface {
-	Set(key string, data interface{}, time int) error
-	Exists(key string) bool
-	Get(key string) ([]byte, error)
-	Delete(key string) (bool, error)
-	LikeDeletes(key string) error
-}
 
 type redisCache struct {
 	redisConn *redis.Pool
@@ -45,6 +39,16 @@ func NewRedis(redisSetting setting.Redis) Cache {
 	}
 
 	return &redisCache{redisConn: redisConn}
+}
+
+func (r *redisCache) GenKey(data ...interface{}) string {
+	values := make([]string, len(data))
+
+	for i, dt := range data {
+		values[i] = converter.ToStr(dt)
+	}
+
+	return strings.Join(values, "_")
 }
 
 // Set a key/value

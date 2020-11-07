@@ -33,22 +33,11 @@ func (r *post) Save(post models.Post) (models.Post, error) {
 func (r *post) FindOne(id uint) (models.Post, error) {
 	var post models.Post
 
-	// key := "POST_" + converter.ToStr(id)
-	// if gredis.Exists(key) {
-	// 	data, err := gredis.Get(key)
-	// 	if err == nil {
-	// 		return models.Post{}, err
-	// 	}
-	// 	_ = json.Unmarshal(data, &post)
-	// 	return post, nil
-	// }
-
 	result := r.db.First(&post, id)
 	if result.Error != nil {
 		return models.Post{}, result.Error
 	}
 
-	// _ = gredis.Set(key, post, 3600)
 	return post, nil
 }
 
