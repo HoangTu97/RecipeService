@@ -13,10 +13,11 @@ type Ingredient interface {
 
 type ingredient struct {
 	repository repository.Ingredient
+	mapper mapper.Ingredient
 }
 
-func NewIngredient(repository repository.Ingredient) Ingredient {
-	return &ingredient{repository: repository}
+func NewIngredient(repository repository.Ingredient, mapper mapper.Ingredient) Ingredient {
+	return &ingredient{repository: repository, mapper: mapper}
 }
 
 func (s *ingredient) FindOneDTO(id uint) (dto.IngredientDTO, bool) {
@@ -24,7 +25,7 @@ func (s *ingredient) FindOneDTO(id uint) (dto.IngredientDTO, bool) {
 	if err != nil {
 		return dto.IngredientDTO{}, false
 	}
-	return mapper.ToIngredientDTO(ingredient), true
+	return s.mapper.ToDTO(ingredient), true
 }
 
 func (s *ingredient) FindIDsByName(name string) []uint {

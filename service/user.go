@@ -17,10 +17,11 @@ type User interface {
 
 type user struct {
 	repository repository.User
+	mapper mapper.User
 }
 
-func NewUser(repository repository.User) User {
-	return &user{repository: repository}
+func NewUser(repository repository.User, mapper mapper.User) User {
+	return &user{repository: repository, mapper: mapper}
 }
 
 func (s *user) Create(userDTO dto.UserDTO) (dto.UserDTO, bool) {
@@ -31,10 +32,10 @@ func (s *user) Create(userDTO dto.UserDTO) (dto.UserDTO, bool) {
 	userDTO.Password = string(pass)
 	userDTO.Roles = append(userDTO.Roles, domain.ROLE_USER)
 
-	user := mapper.ToUser(userDTO)
+	user := s.mapper.ToEntity(userDTO)
 	s.repository.Save(user)
 
-	return mapper.ToUserDTO(user), true
+	return s.mapper.ToDTO(user), true
 }
 
 func (s *user) FindOneLogin(username string, password string) (dto.UserDTO, bool) {
@@ -48,7 +49,7 @@ func (s *user) FindOneLogin(username string, password string) (dto.UserDTO, bool
 		return dto.UserDTO{}, false
 	}
 
-	return mapper.ToUserDTO(user), true
+	return s.mapper.ToDTO(user), true
 }
 
 func (s *user) FindOneByUserID(userId string) (dto.UserDTO, bool) {
@@ -57,5 +58,5 @@ func (s *user) FindOneByUserID(userId string) (dto.UserDTO, bool) {
 		return dto.UserDTO{}, false
 	}
 
-	return mapper.ToUserDTO(user), true
+	return s.mapper.ToDTO(user), true
 }

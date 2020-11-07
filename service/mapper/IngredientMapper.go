@@ -5,7 +5,20 @@ import (
 	"Food/models"
 )
 
-func ToIngredientDTO(entity models.Ingredient) dto.IngredientDTO {
+type Ingredient interface {
+	ToDTO(entity models.Ingredient) dto.IngredientDTO
+	ToEntity(dto dto.IngredientDTO) models.Ingredient
+	ToDTOS(entityList []models.Ingredient) []dto.IngredientDTO
+	ToEntities(dtoList []dto.IngredientDTO) []models.Ingredient
+}
+
+type ingredient struct {}
+
+func NewIngredient() Ingredient {
+	return &ingredient{}
+}
+
+func (m *ingredient) ToDTO(entity models.Ingredient) dto.IngredientDTO {
 	return dto.IngredientDTO{
 		ID:          entity.ID,
 		CreatedAt:   entity.CreatedAt,
@@ -17,7 +30,7 @@ func ToIngredientDTO(entity models.Ingredient) dto.IngredientDTO {
 	}
 }
 
-func ToIngredient(dto dto.IngredientDTO) models.Ingredient {
+func (m *ingredient) ToEntity(dto dto.IngredientDTO) models.Ingredient {
 	return models.Ingredient{
 		ID:          dto.ID,
 		CreatedAt:   dto.CreatedAt,
@@ -29,21 +42,21 @@ func ToIngredient(dto dto.IngredientDTO) models.Ingredient {
 	}
 }
 
-func ToIngredientDTOS(entityList []models.Ingredient) []dto.IngredientDTO {
+func (m *ingredient) ToDTOS(entityList []models.Ingredient) []dto.IngredientDTO {
 	dtos := make([]dto.IngredientDTO, len(entityList))
 
 	for i, v := range entityList {
-		dtos[i] = ToIngredientDTO(v)
+		dtos[i] = m.ToDTO(v)
 	}
 
 	return dtos
 }
 
-func ToIngredients(dtoList []dto.IngredientDTO) []models.Ingredient {
+func (m *ingredient) ToEntities(dtoList []dto.IngredientDTO) []models.Ingredient {
 	entities := make([]models.Ingredient, len(dtoList))
 
 	for i, v := range dtoList {
-		entities[i] = ToIngredient(v)
+		entities[i] = m.ToEntity(v)
 	}
 
 	return entities

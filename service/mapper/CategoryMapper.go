@@ -5,7 +5,20 @@ import (
 	"Food/models"
 )
 
-func ToCategoryDTO(entity models.Category) dto.CategoryDTO {
+type Category interface {
+	ToDTO(entity models.Category) dto.CategoryDTO
+	ToEntity(dto dto.CategoryDTO) models.Category
+	ToDTOS(entityList []models.Category) []dto.CategoryDTO
+	ToEntities(dtoList []dto.CategoryDTO) []models.Category
+}
+
+type category struct {}
+
+func NewCategory() Category {
+	return &category{}
+}
+
+func (m *category) ToDTO(entity models.Category) dto.CategoryDTO {
 	return dto.CategoryDTO{
 		ID:        entity.ID,
 		CreatedAt: entity.CreatedAt,
@@ -16,7 +29,7 @@ func ToCategoryDTO(entity models.Category) dto.CategoryDTO {
 	}
 }
 
-func ToCategory(dto dto.CategoryDTO) models.Category {
+func (m *category) ToEntity(dto dto.CategoryDTO) models.Category {
 	return models.Category{
 		ID:        dto.ID,
 		CreatedAt: dto.CreatedAt,
@@ -27,21 +40,21 @@ func ToCategory(dto dto.CategoryDTO) models.Category {
 	}
 }
 
-func ToCategoryDTOS(entityList []models.Category) []dto.CategoryDTO {
+func (m *category) ToDTOS(entityList []models.Category) []dto.CategoryDTO {
 	dtos := make([]dto.CategoryDTO, len(entityList))
 
 	for i, v := range entityList {
-		dtos[i] = ToCategoryDTO(v)
+		dtos[i] = m.ToDTO(v)
 	}
 
 	return dtos
 }
 
-func ToCategories(dtoList []dto.CategoryDTO) []models.Category {
+func (m *category) ToEntities(dtoList []dto.CategoryDTO) []models.Category {
 	entities := make([]models.Category, len(dtoList))
 
 	for i, v := range dtoList {
-		entities[i] = ToCategory(v)
+		entities[i] = m.ToEntity(v)
 	}
 
 	return entities

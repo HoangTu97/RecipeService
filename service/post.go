@@ -16,20 +16,21 @@ type Post interface {
 
 type post struct {
 	repository repository.Post
+	mapper mapper.Post
 }
 
-func NewPost(repository repository.Post) Post {
-	return &post{repository: repository}
+func NewPost(repository repository.Post, mapper mapper.Post) Post {
+	return &post{repository: repository, mapper: mapper}
 }
 
 func (s *post) Save(postDTO dto.PostDTO) (dto.PostDTO, bool) {
-	post := mapper.ToPost(postDTO)
+	post := s.mapper.ToEntity(postDTO)
 	var err error
 	post, err = s.repository.Save(post)
 	if err != nil {
 		return postDTO, false
 	}
-	return mapper.ToPostDTO(post), true
+	return s.mapper.ToDTO(post), true
 }
 
 func (s *post) FindOne(id uint) (dto.PostDTO, bool) {
@@ -37,7 +38,7 @@ func (s *post) FindOne(id uint) (dto.PostDTO, bool) {
 	if err != nil {
 		return dto.PostDTO{}, false
 	}
-	return mapper.ToPostDTO(post), true
+	return s.mapper.ToDTO(post), true
 }
 
 func (s *post) FindPage(pageable pagination.Pageable) page.Page {

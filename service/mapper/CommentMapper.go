@@ -5,7 +5,20 @@ import (
 	"Food/models"
 )
 
-func ToCommentDTO(entity models.Comment) dto.CommentDTO {
+type Comment interface {
+	ToDTO(entity models.Comment) dto.CommentDTO
+	ToEntity(dto dto.CommentDTO) models.Comment
+	ToDTOS(entityList []models.Comment) []dto.CommentDTO
+	ToEntities(dtoList []dto.CommentDTO) []models.Comment
+}
+
+type comment struct {}
+
+func NewComment() Comment {
+	return &comment{}
+}
+
+func (m *comment) ToDTO(entity models.Comment) dto.CommentDTO {
 	return dto.CommentDTO{
 		ID:          entity.ID,
 		CreatedAt:   entity.CreatedAt,
@@ -17,7 +30,7 @@ func ToCommentDTO(entity models.Comment) dto.CommentDTO {
 	}
 }
 
-func ToComment(dto dto.CommentDTO) models.Comment {
+func (m *comment) ToEntity(dto dto.CommentDTO) models.Comment {
 	return models.Comment{
 		ID:          dto.ID,
 		CreatedAt:   dto.CreatedAt,
@@ -29,21 +42,21 @@ func ToComment(dto dto.CommentDTO) models.Comment {
 	}
 }
 
-func ToCommentDTOS(entityList []models.Comment) []dto.CommentDTO {
+func (m *comment) ToDTOS(entityList []models.Comment) []dto.CommentDTO {
 	dtos := make([]dto.CommentDTO, len(entityList))
 
 	for i, entity := range entityList {
-		dtos[i] = ToCommentDTO(entity)
+		dtos[i] = m.ToDTO(entity)
 	}
 
 	return dtos
 }
 
-func ToComments(dtoList []dto.CommentDTO) []models.Comment {
+func (m *comment) ToEntities(dtoList []dto.CommentDTO) []models.Comment {
 	entities := make([]models.Comment, len(dtoList))
 
 	for i, dto := range dtoList {
-		entities[i] = ToComment(dto)
+		entities[i] = m.ToEntity(dto)
 	}
 
 	return entities

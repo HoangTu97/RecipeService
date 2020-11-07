@@ -20,20 +20,21 @@ type Category interface {
 
 type category struct {
 	repository repository.Category
+	mapper mapper.Category
 }
 
-func NewCategory(repository repository.Category) Category {
-	return &category{repository: repository}
+func NewCategory(repository repository.Category, mapper mapper.Category) Category {
+	return &category{repository: repository, mapper: mapper}
 }
 
 func (s *category) Save(categoryDTO dto.CategoryDTO) (dto.CategoryDTO, bool) {
-	category := mapper.ToCategory(categoryDTO)
+	category := s.mapper.ToEntity(categoryDTO)
 	var err error
 	category, err = s.repository.Save(category)
 	if err != nil {
 		return categoryDTO, false
 	}
-	return mapper.ToCategoryDTO(category), true
+	return s.mapper.ToDTO(category), true
 }
 
 func (s *category) FindOne(id uint) (dto.CategoryDTO, bool) {
@@ -41,7 +42,7 @@ func (s *category) FindOne(id uint) (dto.CategoryDTO, bool) {
 	if err != nil {
 		return dto.CategoryDTO{}, false
 	}
-	return mapper.ToCategoryDTO(category), true
+	return s.mapper.ToDTO(category), true
 }
 
 func (s *category) FindByName(name string) ([]models.Category, bool) {
@@ -54,7 +55,7 @@ func (s *category) FindByName(name string) ([]models.Category, bool) {
 
 func (s *category) FindAll() []dto.CategoryDTO {
 	categories := s.repository.FindAll()
-	return mapper.ToCategoryDTOS(categories)
+	return s.mapper.ToDTOS(categories)
 }
 
 func (s *category) FindPage(pageable pagination.Pageable) page.Page {

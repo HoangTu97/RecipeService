@@ -6,7 +6,20 @@ import (
 	"Food/models"
 )
 
-func ToPostDTO(entity models.Post) dto.PostDTO {
+type Post interface {
+	ToDTO(entity models.Post) dto.PostDTO
+	ToEntity(dto dto.PostDTO) models.Post
+	ToDTOS(entityList []models.Post) []dto.PostDTO
+	ToEntities(dtoList []dto.PostDTO) []models.Post
+}
+
+type post struct {}
+
+func NewPost() Post {
+	return &post{}
+}
+
+func (m *post) ToDTO(entity models.Post) dto.PostDTO {
 	return dto.PostDTO{
 		ID:          entity.ID,
 		CreatedAt:   entity.CreatedAt,
@@ -21,7 +34,7 @@ func ToPostDTO(entity models.Post) dto.PostDTO {
 	}
 }
 
-func ToPost(dto dto.PostDTO) models.Post {
+func (m *post) ToEntity(dto dto.PostDTO) models.Post {
 	return models.Post{
 		ID:          dto.ID,
 		CreatedAt:   dto.CreatedAt,
@@ -36,21 +49,21 @@ func ToPost(dto dto.PostDTO) models.Post {
 	}
 }
 
-func ToPostDTOS(entityList []models.Post) []dto.PostDTO {
+func (m *post) ToDTOS(entityList []models.Post) []dto.PostDTO {
 	dtos := make([]dto.PostDTO, len(entityList))
 
 	for i, entity := range entityList {
-		dtos[i] = ToPostDTO(entity)
+		dtos[i] = m.ToDTO(entity)
 	}
 
 	return dtos
 }
 
-func ToPosts(dtoList []dto.PostDTO) []models.Post {
+func (m *post) ToEntities(dtoList []dto.PostDTO) []models.Post {
 	entities := make([]models.Post, len(dtoList))
 
 	for i, dto := range dtoList {
-		entities[i] = ToPost(dto)
+		entities[i] = m.ToEntity(dto)
 	}
 
 	return entities

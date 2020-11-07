@@ -4,6 +4,7 @@ import (
 	"Food/controller"
 	"Food/repository"
 	"Food/service"
+	"Food/service/mapper"
 
 	"gorm.io/gorm"
 )
@@ -19,6 +20,13 @@ var (
 )
 
 func SetupController(db *gorm.DB) {
+	cateMapper := mapper.NewCategory()
+	commentMapper := mapper.NewComment()
+	ingredientMapper := mapper.NewIngredient()
+	postMapper := mapper.NewPost()
+	recipeIngreMapper := mapper.NewRecipeIngredient()
+	recipeMapper := mapper.NewRecipe()
+	userMapper := mapper.NewUser()
 
 	cateRepo := repository.NewCategory(db)
 	commentRepo := repository.NewComment(db)
@@ -29,14 +37,14 @@ func SetupController(db *gorm.DB) {
 	// userRecipeInteractRepo := repository.NewUserRecipeInteraction(db)
 	userRepo := repository.NewUser(db)
 
-	cateService := service.NewCategory(cateRepo)
-	commentService := service.NewComment(commentRepo)
-	ingreService := service.NewIngredient(ingreRepo)
-	postService := service.NewPost(postRepo)
-	recipeIngreService := service.NewRecipeIngredients(recipeIngreRepo)
-	recipeService := service.NewRecipe(recipeRepo)
+	cateService := service.NewCategory(cateRepo, cateMapper)
+	commentService := service.NewComment(commentRepo, commentMapper)
+	ingreService := service.NewIngredient(ingreRepo, ingredientMapper)
+	postService := service.NewPost(postRepo, postMapper)
+	recipeIngreService := service.NewRecipeIngredients(recipeIngreRepo, recipeIngreMapper)
+	recipeService := service.NewRecipe(recipeRepo, recipeMapper)
 	// userRecipeInteractService := service.NewUser(userRecipeInteractRepo)
-	userService := service.NewUser(userRepo)
+	userService := service.NewUser(userRepo, userMapper)
 
 	CateController = controller.NewCategory(cateService)
 	CommentController = controller.NewComment(commentService, postService)

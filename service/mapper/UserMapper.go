@@ -9,7 +9,20 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-func ToUserDTO(entity models.User) dto.UserDTO {
+type User interface {
+	ToDTO(entity models.User) dto.UserDTO
+	ToEntity(dto dto.UserDTO) models.User
+	ToDTOS(entityList []models.User) []dto.UserDTO
+	ToEntities(dtoList []dto.UserDTO) []models.User
+}
+
+type user struct {}
+
+func NewUser() User {
+	return &user{}
+}
+
+func (m *user) ToDTO(entity models.User) dto.UserDTO {
 	roleStrings, _ := converter.ArrStr(entity.Roles)
 	roles := make([]domain.UserRole, len(roleStrings))
 	for i, r := range roleStrings {
@@ -36,7 +49,7 @@ func ToUserDTO(entity models.User) dto.UserDTO {
 	}
 }
 
-func ToUser(dto dto.UserDTO) models.User {
+func (m *user) ToEntity(dto dto.UserDTO) models.User {
 	var id uuid.UUID
 	if len(dto.UserID) > 0 {
 		id = uuid.Must(uuid.FromString(dto.UserID))
@@ -66,21 +79,21 @@ func ToUser(dto dto.UserDTO) models.User {
 	}
 }
 
-func ToUserDTOS(entityList []models.User) []dto.UserDTO {
+func (m *user) ToDTOS(entityList []models.User) []dto.UserDTO {
 	dtos := make([]dto.UserDTO, len(entityList))
 
 	for i, entity := range entityList {
-		dtos[i] = ToUserDTO(entity)
+		dtos[i] = m.ToDTO(entity)
 	}
 
 	return dtos
 }
 
-func ToUsers(dtoList []dto.UserDTO) []models.User {
+func (m *user) ToEntities(dtoList []dto.UserDTO) []models.User {
 	entities := make([]models.User, len(dtoList))
 
 	for i, dto := range dtoList {
-		entities[i] = ToUser(dto)
+		entities[i] = m.ToEntity(dto)
 	}
 
 	return entities

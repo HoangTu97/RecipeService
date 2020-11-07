@@ -25,20 +25,21 @@ type Recipe interface {
 
 type recipe struct {
 	repository repository.Recipe
+	mapper mapper.Recipe
 }
 
-func NewRecipe(repository repository.Recipe) Recipe {
-	return &recipe{repository: repository}
+func NewRecipe(repository repository.Recipe, mapper mapper.Recipe) Recipe {
+	return &recipe{repository: repository, mapper: mapper}
 }
 
 func (s *recipe) Save(recipeDTO dto.RecipeDTO) (dto.RecipeDTO, bool) {
-	recipe := mapper.ToRecipe(recipeDTO)
+	recipe := s.mapper.ToEntity(recipeDTO)
 	var err error
 	recipe, err = s.repository.Save(recipe)
 	if err != nil {
 		return recipeDTO, false
 	}
-	return mapper.ToRecipeDTO(recipe), true
+	return s.mapper.ToDTO(recipe), true
 }
 
 // FindPageByCateID return page models.Recipe
@@ -80,7 +81,7 @@ func (s *recipe) FindOne(id uint) (dto.RecipeDTO, bool) {
 	if err != nil {
 		return dto.RecipeDTO{}, false
 	}
-	return mapper.ToRecipeDTO(recipe), true
+	return s.mapper.ToDTO(recipe), true
 }
 
 func (s *recipe) FindOneWithCate(id uint) (models.Recipe, bool) {
