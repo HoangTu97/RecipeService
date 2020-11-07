@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"Food/config"
-	"Food/helpers/cache"
 	"Food/helpers/database"
 	"Food/helpers/jwt"
 	"Food/helpers/logging"
@@ -23,15 +22,18 @@ import (
 // @name Authorization
 func main() {
 	config.Setup()
+
+	gin.SetMode(config.ServerSetting.RunMode)
+
 	database, closeDB := database.NewDB(*config.DatabaseSetting)
 	defer closeDB()
 	database = config.SetupDB(database)
-	logging.NewLogger(*config.LoggerSetting)
-	cache.NewRedis(*config.RedisSetting)
+
+	// logging.NewLogger(*config.LoggerSetting)
+	logging.NewZeroLog()
+
 	jwt.Setup(*config.AppSetting)
 	config.SetupController(database)
-
-	gin.SetMode(config.ServerSetting.RunMode)
 
 	routersInit := routers.InitRouter()
 	readTimeout := config.ServerSetting.ReadTimeout

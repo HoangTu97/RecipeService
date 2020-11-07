@@ -2,6 +2,7 @@ package config
 
 import (
 	"Food/controller"
+	"Food/helpers/cache"
 	"Food/repository"
 	"Food/service"
 	"Food/service/mapper"
@@ -20,6 +21,8 @@ var (
 )
 
 func SetupController(db *gorm.DB) {
+	cache := cache.NewRedis(*RedisSetting)
+
 	cateMapper := mapper.NewCategory()
 	commentMapper := mapper.NewComment()
 	ingredientMapper := mapper.NewIngredient()
@@ -47,11 +50,13 @@ func SetupController(db *gorm.DB) {
 	// userRecipeInteractService := service.NewUser(userRecipeInteractRepo)
 	userService := service.NewUser(userRepo, userMapper)
 
+	userServiceProxy := service.NewUserProxy(userService, cache)
+
 	CateController = controller.NewCategory(cateService)
 	CommentController = controller.NewComment(commentService, postService)
 	ImageController = controller.NewImage(imageService)
 	IngredientController = controller.NewIngredient(ingreService, recipeService, recipeIngreService)
 	PostController = controller.NewPost(postService, userService, recipeService)
 	RecipeController = controller.NewRecipe(recipeService, cateService, ingreService)
-	UserController = controller.NewUser(userService)
+	UserController = controller.NewUser(userServiceProxy)
 }
