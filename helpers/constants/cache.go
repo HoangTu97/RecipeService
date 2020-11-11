@@ -1,4 +1,4 @@
-package e
+package constants
 
 const (
 	CACHE_ARTICLE = "ARTICLE"

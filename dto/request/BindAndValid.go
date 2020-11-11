@@ -13,7 +13,7 @@ import (
 func BindAndValid(c *gin.Context, form interface{}) (int) {
 	err := c.Bind(form)
 	if err != nil {
-		return e.INVALID_PARAMS
+		return e.INVALID_REQUEST
 	}
 
 	valid := validation.Validation{}
@@ -23,7 +23,7 @@ func BindAndValid(c *gin.Context, form interface{}) (int) {
 	}
 	if !check {
 		MarkErrors(valid.Errors)
-		return e.INVALID_PARAMS
+		return e.INVALID_REQUEST
 	}
 
 	return e.SUCCESS
