@@ -137,7 +137,7 @@ func (r *recipe) FindPage(pageable pagination.Pageable) page.Page {
 	var recipes []models.Recipe
 
 	paginator := pagination.Paging(&pagination.Param{
-		DB:      r.db.Joins("Categories"),
+		DB:      r.db.Preload("Categories"),
 		Page:    pageable.GetPageNumber(),
 		Limit:   pageable.GetPageSize(),
 		OrderBy: []string{"id desc"},
