@@ -43,13 +43,21 @@ func (r *user) Register(c *gin.Context) {
 
 	userDTO := dto.UserDTO{Name: registerDTO.Username, Password: registerDTO.Password}
 
-	_, isSuccess := r.service.Create(userDTO)
+	userDTO, isSuccess := r.service.Create(userDTO)
 	if !isSuccess {
 		response.CreateErrorResponse(c, "Register failed!!!")
 		return
 	}
 
-	response.CreateSuccesResponse(c, nil)
+	tokenString, error := jwt.GenerateToken(userDTO.UserID, userDTO.Name, userDTO.GetRolesStr())
+	if error != nil {
+		response.CreateErrorResponse(c, "INTERNAL_ERROR")
+		return
+	}
+
+	response.CreateSuccesResponse(c, UserResponse.RegisterResponseDTO{
+		Token: tokenString,
+	})
 }
 
 // Login login

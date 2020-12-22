@@ -1,10 +1,8 @@
 package cache
 
 import (
-	"Food/helpers/converter"
 	"Food/helpers/setting"
 	"encoding/json"
-	"strings"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
@@ -42,13 +40,7 @@ func NewRedis(redisSetting setting.Redis) Cache {
 }
 
 func (r *redisCache) GenKey(data ...interface{}) string {
-	values := make([]string, len(data))
-
-	for i, dt := range data {
-		values[i] = converter.ToStr(dt)
-	}
-
-	return strings.Join(values, "_")
+	return GenKey(data)
 }
 
 // Set a key/value
