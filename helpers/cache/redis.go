@@ -12,18 +12,18 @@ type redisCache struct {
 	redisConn *redis.Pool
 }
 
-func NewRedis(redisSetting setting.Redis) Cache {
+func NewRedis(cacheSetting setting.Cache) Cache {
 	redisConn := &redis.Pool{
-		MaxIdle:     redisSetting.MaxIdle,
-		MaxActive:   redisSetting.MaxActive,
-		IdleTimeout: redisSetting.IdleTimeout,
+		MaxIdle:     cacheSetting.MaxIdle,
+		MaxActive:   cacheSetting.MaxActive,
+		IdleTimeout: cacheSetting.IdleTimeout,
 		Dial: func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", redisSetting.Host)
+			c, err := redis.Dial("tcp", cacheSetting.Host)
 			if err != nil {
 				return nil, err
 			}
-			if redisSetting.Password != "" {
-				if _, err := c.Do("AUTH", redisSetting.Password); err != nil {
+			if cacheSetting.Password != "" {
+				if _, err := c.Do("AUTH", cacheSetting.Password); err != nil {
 					c.Close()
 					return nil, err
 				}
@@ -40,7 +40,7 @@ func NewRedis(redisSetting setting.Redis) Cache {
 }
 
 func (r *redisCache) GenKey(data ...interface{}) string {
-	return GenKey(data)
+	return genKey(data)
 }
 
 // Set a key/value

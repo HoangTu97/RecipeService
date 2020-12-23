@@ -7,24 +7,24 @@ import (
 
 // UserDTO godoc
 type UserDTO struct {
-	ID       uint
-	UserID   string
-	Name     string
-	Password string
-	Roles    []domain.UserRole
-	Address  string
+	ID       uint              `json:"id"`
+	UserID   string            `json:"userId"`
+	Name     string            `json:"name"`
+	Password string            `json:"password"`
+	Roles    []domain.UserRole `json:"roles"`
+	Address  string            `json:"address"`
 
 	// features
-	Age        uint8
-	Gender     string
-	Occupation string
-	Long       float32
-	Lat        float32
-	ZipCode    uint16
+	Age        uint8   `json:"age"`
+	Gender     string  `json:"gender"`
+	Occupation string  `json:"occupation"`
+	Long       float32 `json:"long"`
+	Lat        float32 `json:"lat"`
+	ZipCode    uint16  `json:"zipCode"`
 
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt *time.Time
+	CreatedAt time.Time  `json:"createdAt"`
+	UpdatedAt time.Time  `json:"updatedAt"`
+	DeletedAt *time.Time `json:"deletedAt"`
 }
 
 func (dto *UserDTO) GetRolesInterface() []interface{} {
@@ -46,3 +46,19 @@ func (dto *UserDTO) GetRolesStr() []string {
 
 	return arr
 }
+
+// func (dto *UserDTO) UnmarshalJSON(data []byte) error {
+// 	var v map[string]string
+// 	err := json.Unmarshal(data, &v)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	roles := []int(v["roles"])
+// 	dto.Roles = make([]domain.UserRole, len(roles))
+// 	for i, role := range roles {
+// 		dto.Roles[i] = domain.UserRole(role)
+// 	}
+
+// 	return nil
+// }

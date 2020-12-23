@@ -41,6 +41,12 @@ func (r *user) Register(c *gin.Context) {
 		return
 	}
 
+	_, checkRegistered := r.service.FindOneByUsername(registerDTO.Username)
+	if checkRegistered {
+		response.CreateErrorResponse(c, "USER_EXISTED")
+		return
+	}
+
 	userDTO := dto.UserDTO{Name: registerDTO.Username, Password: registerDTO.Password}
 
 	userDTO, isSuccess := r.service.Create(userDTO)
@@ -81,9 +87,9 @@ func (r *user) Login(c *gin.Context) {
 		return
 	}
 
-	tokenString, error := jwt.GenerateToken(userDTO.UserID, userDTO.Name, userDTO.GetRolesStr())
-	if error != nil {
-		response.CreateErrorResponse(c, "UNAUTHORIZED")
+	tokenString, err := r.service.GetUserToken(userDTO)
+	if err != nil {
+		response.CreateErrorResponse(c, "ERROR_GEN_TOKEN")
 		return
 	}
 

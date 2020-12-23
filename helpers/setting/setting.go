@@ -32,7 +32,8 @@ type Database struct {
 	Password string
 }
 
-type Redis struct {
+type Cache struct {
+	Type        string
 	Host        string
 	Port        string
 	Password    string

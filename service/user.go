@@ -3,6 +3,7 @@ package service
 import (
 	"Food/domain"
 	"Food/dto"
+	"Food/helpers/jwt"
 	"Food/repository"
 	"Food/service/mapper"
 
@@ -11,13 +12,15 @@ import (
 
 type User interface {
 	Create(userDTO dto.UserDTO) (dto.UserDTO, bool)
+	GetUserToken(userDTO dto.UserDTO) (string, error)
 	FindOneLogin(username string, password string) (dto.UserDTO, bool)
 	FindOneByUserID(userId string) (dto.UserDTO, bool)
+	FindOneByUsername(username string) (dto.UserDTO, bool)
 }
 
 type user struct {
 	repository repository.User
-	mapper mapper.User
+	mapper     mapper.User
 }
 
 func NewUser(repository repository.User, mapper mapper.User) User {
@@ -38,6 +41,15 @@ func (s *user) Create(userDTO dto.UserDTO) (dto.UserDTO, bool) {
 	return s.mapper.ToDTO(user), true
 }
 
+func (s *user) GetUserToken(userDTO dto.UserDTO) (string, error) {
+	tokenString, err := jwt.GenerateToken(userDTO.UserID, userDTO.Name, userDTO.GetRolesStr())
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
+}
+
 func (s *user) FindOneLogin(username string, password string) (dto.UserDTO, bool) {
 	user, err := s.repository.FindOneByName(username)
 	if err != nil {
@@ -54,6 +66,15 @@ func (s *user) FindOneLogin(username string, password string) (dto.UserDTO, bool
 
 func (s *user) FindOneByUserID(userId string) (dto.UserDTO, bool) {
 	user, err := s.repository.FineOneByUserId(userId)
+	if err != nil {
+		return dto.UserDTO{}, false
+	}
+
+	return s.mapper.ToDTO(user), true
+}
+
+func (s *user) FindOneByUsername(username string) (dto.UserDTO, bool) {
+	user, err := s.repository.FindOneByName(username)
 	if err != nil {
 		return dto.UserDTO{}, false
 	}

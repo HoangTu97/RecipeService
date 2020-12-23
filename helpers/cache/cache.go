@@ -2,6 +2,7 @@ package cache
 
 import (
 	"Food/helpers/converter"
+	"Food/helpers/setting"
 	"strings"
 )
 
@@ -14,7 +15,7 @@ type Cache interface {
 	LikeDeletes(key string) error
 }
 
-func GenKey(data ...interface{}) string {
+func genKey(data ...interface{}) string {
 	values := make([]string, len(data))
 
 	for i, dt := range data {
@@ -22,4 +23,14 @@ func GenKey(data ...interface{}) string {
 	}
 
 	return strings.Join(values, "_")
+}
+
+func NewCache(cacheSetting setting.Cache) Cache {
+	if cacheSetting.Type == "redis" {
+		return NewRedis(cacheSetting)
+	}
+	if cacheSetting.Type == "memory" {
+		return NewMem(cacheSetting)
+	}
+	return nil
 }

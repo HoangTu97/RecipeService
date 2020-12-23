@@ -14,6 +14,7 @@ require (
 	github.com/go-openapi/swag v0.19.9 // indirect
 	github.com/gomodule/redigo v2.0.1-0.20180401191855-9352ab68be13+incompatible
 	github.com/mailru/easyjson v0.7.6 // indirect
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/rs/zerolog v1.20.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/smartystreets/goconvey v1.6.4 // indirect

@@ -12,7 +12,7 @@ var AppSetting = &setting.App{}
 var LoggerSetting = &setting.Logger{}
 var ServerSetting = &setting.Server{}
 var DatabaseSetting = &setting.Database{}
-var RedisSetting = &setting.Redis{}
+var CacheSetting = &setting.Cache{}
 var RabbitMQSetting = &setting.RabbitMQ{}
 
 var cfg *ini.File
@@ -29,11 +29,11 @@ func Setup() {
 	mapTo("logger", LoggerSetting)
 	mapTo("server", ServerSetting)
 	mapTo("database", DatabaseSetting)
-	mapTo("redis", RedisSetting)
+	mapTo("cache", CacheSetting)
 
 	ServerSetting.ReadTimeout = ServerSetting.ReadTimeout * time.Second
 	ServerSetting.WriteTimeout = ServerSetting.WriteTimeout * time.Second
-	RedisSetting.IdleTimeout = RedisSetting.IdleTimeout * time.Second
+	CacheSetting.IdleTimeout = CacheSetting.IdleTimeout * time.Second
 }
 
 // mapTo map section

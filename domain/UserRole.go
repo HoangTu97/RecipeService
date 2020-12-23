@@ -2,7 +2,9 @@ package domain
 
 import (
 	"Food/helpers/constants"
+	"bytes"
 	"database/sql/driver"
+	"encoding/json"
 	"fmt"
 )
 
@@ -13,21 +15,28 @@ const (
 	ROLE_ADMIN
 )
 
-var _roleNames = []string{
+var toString = []string{
 	constants.ROLE_USER,
 	constants.ROLE_ADMIN,
 }
 
 func (role UserRole) String() string {
-	return _roleNames[role]
+	return toString[role]
 }
 
-func (role UserRole) MarshalText() []byte {
-	return []byte(role.String())
+func (role UserRole) MarshalJSON() ([]byte, error) {
+	buffer := bytes.NewBufferString(`"`)
+	buffer.WriteString(toString[role])
+	buffer.WriteString(`"`)
+	return buffer.Bytes(), nil
 }
 
-func (role *UserRole) UnmarshalText(text []byte) error {
-	str := string(text)
+func (role *UserRole) UnmarshalJSON(data []byte) error {
+	var str string
+	err1 := json.Unmarshal(data, &str)
+	if err1 != nil {
+		return err1
+	}
 	_role, err := ParseUserRole(str)
 	if err != nil {
 		return err
@@ -50,7 +59,7 @@ func (role *UserRole) Value() (driver.Value, error) {
 }
 
 func ParseUserRole(value string) (UserRole, error) {
-	for i, v := range _roleNames {
+	for i, v := range toString {
 		if v == value {
 			return UserRole(i), nil
 		}

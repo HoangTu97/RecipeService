@@ -21,7 +21,7 @@ var (
 )
 
 func SetupController(db *gorm.DB) {
-	cache := cache.NewRedis(*RedisSetting)
+	cache := cache.NewCache(*CacheSetting)
 
 	cateMapper := mapper.NewCategory()
 	commentMapper := mapper.NewComment()
@@ -56,7 +56,7 @@ func SetupController(db *gorm.DB) {
 	CommentController = controller.NewComment(commentService, postService)
 	ImageController = controller.NewImage(imageService)
 	IngredientController = controller.NewIngredient(ingreService, recipeService, recipeIngreService)
-	PostController = controller.NewPost(postService, userService, recipeService)
+	PostController = controller.NewPost(postService, userServiceProxy, recipeService)
 	RecipeController = controller.NewRecipe(recipeService, cateService, ingreService)
 	UserController = controller.NewUser(userServiceProxy)
 }
