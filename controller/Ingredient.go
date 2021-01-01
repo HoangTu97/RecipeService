@@ -3,7 +3,7 @@ package controller
 import (
 	"Food/dto/response"
 	IngreResponse "Food/dto/response/ingredient"
-	"Food/helpers/converter"
+	"Food/pkg/converter"
 	"Food/service"
 
 	"github.com/gin-gonic/gin"

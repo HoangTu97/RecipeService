@@ -11,8 +11,8 @@ import (
 	// postgres
 	"gorm.io/gorm"
 
-	"Food/helpers/converter"
 	"Food/models"
+	"Food/pkg/converter"
 )
 
 type DB interface {

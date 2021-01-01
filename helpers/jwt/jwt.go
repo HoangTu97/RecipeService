@@ -2,7 +2,7 @@ package jwt
 
 import (
 	"Food/domain"
-	"Food/helpers/util"
+	"Food/pkg/util"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"

@@ -77,9 +77,9 @@ func Int2HexStr(num int) (hex string) {
 
 		c := "?"
 		if r >= 0 && r <= 9 {
-			c = string(r + '0')
+			c = string(rune(r + '0'))
 		} else {
-			c = string(r + 'a' - 10)
+			c = string(rune(r + 'a' - 10))
 		}
 		hex = c + hex
 		num = num / 16

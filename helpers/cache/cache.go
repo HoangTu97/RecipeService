@@ -1,8 +1,8 @@
 package cache
 
 import (
-	"Food/helpers/converter"
 	"Food/helpers/setting"
+	"Food/pkg/converter"
 	"strings"
 )
 

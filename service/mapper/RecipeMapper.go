@@ -2,8 +2,8 @@ package mapper
 
 import (
 	"Food/dto"
-	"Food/helpers/converter"
 	"Food/models"
+	"Food/pkg/converter"
 )
 
 type Recipe interface {

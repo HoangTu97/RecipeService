@@ -1,8 +1,8 @@
 package recipe
 
 import (
-	"Food/helpers/converter"
 	"Food/models"
+	"Food/pkg/converter"
 )
 
 // RecipeDetail_CateResponseDTO godoc

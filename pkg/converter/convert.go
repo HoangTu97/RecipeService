@@ -6,7 +6,7 @@ import (
 )
 
 func Exist(f string) bool {
-	return f != string(0x1E)
+	return f != string(rune(0x1E))
 }
 
 func Uint(f string) (uint, error) {

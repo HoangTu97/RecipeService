@@ -3,8 +3,8 @@ package mapper
 import (
 	"Food/domain"
 	"Food/dto"
-	"Food/helpers/converter"
 	"Food/models"
+	"Food/pkg/converter"
 
 	uuid "github.com/satori/go.uuid"
 )

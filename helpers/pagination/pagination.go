@@ -1,7 +1,7 @@
 package pagination
 
 import (
-	"Food/helpers/converter"
+	"Food/pkg/converter"
 
 	"github.com/gin-gonic/gin"
 )
