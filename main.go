@@ -22,9 +22,6 @@ import (
 func main() {
 	config.Setup()
 
-	gin.ForceConsoleColor()
-	gin.SetMode(config.ServerSetting.RunMode)
-
 	database, closeDB := database.NewDB(*config.DatabaseSetting)
 	defer closeDB()
 	database = config.SetupDB(database)
@@ -34,6 +31,9 @@ func main() {
 
 	config.SetupJWT(*config.AppSetting)
 	config.SetupController(database)
+
+	gin.ForceConsoleColor()
+	gin.SetMode(config.ServerSetting.RunMode)
 
 	router := routers.InitRouter()
 
