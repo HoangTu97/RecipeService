@@ -63,9 +63,15 @@ func main() {
 		SSLKeys.CERT = "./cert/myCA.cer"
 		SSLKeys.KEY = "./cert/myCA.key"
 
-		server.ListenAndServeTLS(SSLKeys.CERT, SSLKeys.KEY)
+		err := server.ListenAndServeTLS(SSLKeys.CERT, SSLKeys.KEY)
+		if err != nil {
+			log.Fatal("Web server (HTTPS): ", err)
+		}
 	} else {
-		server.ListenAndServe()
+		err := server.ListenAndServe()
+		if err != nil {
+			log.Fatal("Web server (HTTP): ", err)
+		}
 	}
 
 }
