@@ -3,6 +3,7 @@ package service
 import (
 	"Food/dto"
 	"Food/helpers/cache"
+	"Food/helpers/constants"
 	"encoding/json"
 )
 
@@ -47,7 +48,7 @@ func (s *userProxy) GetUserToken(userDTO dto.UserDTO) (string, error) {
 func (s *userProxy) FindOneLogin(username string, password string) (dto.UserDTO, bool) {
 	var userDTO dto.UserDTO
 
-	key := s.cache.GenKey("UserDTO", username, password)
+	key := s.cache.GenKey(constants.CACHE.USER, username, password)
 	if s.cache.Exists(key) {
 		data, err := s.cache.Get(key)
 		if err != nil {
@@ -77,7 +78,7 @@ func (s *userProxy) FindOneByUserID(userId string) (dto.UserDTO, bool) {
 func (s *userProxy) FindOneByUsername(username string) (dto.UserDTO, bool) {
 	var userDTO dto.UserDTO
 
-	key := s.cache.GenKey("UserDTO_name", username)
+	key := s.cache.GenKey(constants.CACHE.USER, "name", username)
 	if s.cache.Exists(key) {
 		data, err := s.cache.Get(key)
 		if err != nil {
