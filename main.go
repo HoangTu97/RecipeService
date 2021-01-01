@@ -9,7 +9,6 @@ import (
 
 	"Food/config"
 	"Food/helpers/database"
-	"Food/helpers/jwt"
 	"Food/helpers/logging"
 	"Food/routers"
 )
@@ -32,7 +31,7 @@ func main() {
 	// logging.NewLogger(*config.LoggerSetting)
 	logging.NewZeroLog()
 
-	jwt.Setup(*config.AppSetting)
+	config.SetupJWT(*config.AppSetting)
 	config.SetupController(database)
 
 	routersInit := routers.InitRouter()
