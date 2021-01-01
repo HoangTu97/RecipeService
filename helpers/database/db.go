@@ -15,7 +15,7 @@ func NewDB(config setting.Database) (*gorm.DB, func()) {
 
 	switch config.Type {
 	case "sqlite3":
-		dialector = sqlite.Open("test.db")
+		dialector = sqlite.Open(config.Name)
 	case "postgres":
 		dialector = postgres.New(postgres.Config{
 			DSN: fmt.Sprintf("host=%s user=%s password=%s dbname=%s ",

@@ -22,6 +22,7 @@ import (
 func main() {
 	config.Setup()
 
+	gin.ForceConsoleColor()
 	gin.SetMode(config.ServerSetting.RunMode)
 
 	database, closeDB := database.NewDB(*config.DatabaseSetting)
@@ -34,7 +35,8 @@ func main() {
 	config.SetupJWT(*config.AppSetting)
 	config.SetupController(database)
 
-	routersInit := routers.InitRouter()
+	router := routers.InitRouter()
+
 	readTimeout := config.ServerSetting.ReadTimeout
 	writeTimeout := config.ServerSetting.WriteTimeout
 	endPoint := fmt.Sprintf(":%s", config.ServerSetting.HTTPPort)
@@ -42,7 +44,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:           endPoint,
-		Handler:        routersInit,
+		Handler:        router,
 		ReadTimeout:    readTimeout,
 		WriteTimeout:   writeTimeout,
 		MaxHeaderBytes: maxHeaderBytes,
@@ -50,22 +52,20 @@ func main() {
 
 	log.Printf("[info] start http server listening %s", endPoint)
 
-	server.ListenAndServe()
+	if config.ServerSetting.SSL {
 
-	// if config.ServerSetting.SSL {
+		SSLKeys := &struct {
+			CERT string
+			KEY  string
+		}{}
 
-	// 	SSLKeys := &struct {
-	// 		CERT string
-	// 		KEY  string
-	// 	}{}
+		//Generated using sh generate-certificate.sh
+		SSLKeys.CERT = "./cert/myCA.cer"
+		SSLKeys.KEY = "./cert/myCA.key"
 
-	// 	//Generated using sh generate-certificate.sh
-	// 	SSLKeys.CERT = "./cert/myCA.cer"
-	// 	SSLKeys.KEY = "./cert/myCA.key"
-
-	// 	routersInit.RunTLS(":"+config.ServerSetting.HTTPPort, SSLKeys.CERT, SSLKeys.KEY)
-	// } else {
-	// 	routersInit.Run(":" + config.ServerSetting.HTTPPort)
-	// }
+		server.ListenAndServeTLS(SSLKeys.CERT, SSLKeys.KEY)
+	} else {
+		server.ListenAndServe()
+	}
 
 }
