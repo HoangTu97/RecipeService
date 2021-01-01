@@ -1,6 +1,15 @@
 package constants
 
-const (
-	ROLE_USER  = "ROLE_USER"
-	ROLE_ADMIN = "ROLE_ADMIN"
-)
+var ROLE role
+
+type role struct {
+	USER string
+	ADMIN string
+}
+
+func init() {
+	ROLE = role{
+		USER: "USER",
+		ADMIN: "ADMIN",
+	}
+}

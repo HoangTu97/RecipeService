@@ -6,7 +6,6 @@ import (
 	UserRequest "Food/dto/request/user"
 	"Food/dto/response"
 	UserResponse "Food/dto/response/user"
-	"Food/helpers/e"
 	"Food/helpers/jwt"
 	"Food/service"
 
@@ -35,9 +34,9 @@ func NewUser(service service.User) User {
 // @Router /api/public/user/register [post]
 func (r *user) Register(c *gin.Context) {
 	var registerDTO UserRequest.RegisterDTO
-	errCode := request.BindAndValid(c, &registerDTO)
-	if errCode != e.SUCCESS {
-		response.CreateErrorResponse(c, e.GetMsg(errCode))
+	err := request.BindAndValid(c, &registerDTO)
+	if err != nil {
+		response.CreateErrorResponse(c, err.Error())
 		return
 	}
 
@@ -75,9 +74,9 @@ func (r *user) Register(c *gin.Context) {
 // @Router /api/public/user/login [post]
 func (r *user) Login(c *gin.Context) {
 	var loginDTO UserRequest.LoginDTO
-	errCode := request.BindAndValid(c, &loginDTO)
-	if errCode != e.SUCCESS {
-		response.CreateErrorResponse(c, e.GetMsg(errCode))
+	err := request.BindAndValid(c, &loginDTO)
+	if err != nil {
+		response.CreateErrorResponse(c, err.Error())
 		return
 	}
 

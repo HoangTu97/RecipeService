@@ -6,7 +6,6 @@ import (
 	PostRequest "Food/dto/request/post"
 	"Food/dto/response"
 	PostResponse "Food/dto/response/post"
-	"Food/helpers/e"
 	"Food/helpers/pagination"
 	"Food/helpers/security"
 	"Food/service"
@@ -58,9 +57,9 @@ func (r *post) CreatePost(c *gin.Context) {
 	userId := security.GetUserID(c)
 
 	var requestDTO PostRequest.PostCreateRequestDTO
-	errCode := request.BindAndValid(c, &requestDTO)
-	if errCode != e.SUCCESS {
-		response.CreateErrorResponse(c, e.GetMsg(errCode))
+	err := request.BindAndValid(c, &requestDTO)
+	if err != nil {
+		response.CreateErrorResponse(c, err.Error())
 		return
 	}
 

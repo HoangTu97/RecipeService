@@ -3,6 +3,7 @@ package middlewares
 import (
 	"Food/domain"
 	"Food/dto/response"
+	"Food/helpers/constants"
 	"regexp"
 
 	"github.com/gin-gonic/gin"
@@ -19,14 +20,14 @@ func Security(c *gin.Context) {
 	if regexp.MustCompile(`/api/private/.*`).Match([]byte(c.Request.URL.Path)) {
 		iUserInfo, exists := c.Get("UserInfo")
 		if !exists {
-			response.CreateErrorResponse(c, "UNAUTHORIZED")
+			response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
 			c.Abort()
 			return
 		}
 
 		userInfo := iUserInfo.(*domain.Token)
 		if err := userInfo.Valid(); err != nil {
-			response.CreateErrorResponse(c, "INVALID_TOKEN")
+			response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
 			c.Abort()
 			return
 		}
@@ -42,14 +43,14 @@ func Security(c *gin.Context) {
 func Authenticated(c *gin.Context) {
 	iUserInfo, exists := c.Get("UserInfo")
 	if !exists {
-		response.CreateErrorResponse(c, "UNAUTHORIZED")
+		response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
 		c.Abort()
 		return
 	}
 
 	userInfo := iUserInfo.(*domain.Token)
 	if err := userInfo.Valid(); err != nil {
-		response.CreateErrorResponse(c, "INVALID_TOKEN")
+		response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
 		c.Abort()
 		return
 	}
@@ -62,7 +63,7 @@ func HasAuthority(authority string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userInfo := c.MustGet("UserInfo").(*domain.Token)
 		if !userInfo.HasAuthority(authority) {
-			response.CreateErrorResponse(c, "UNAUTHORIZED")
+			response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
 			c.Abort()
 			return
 		}

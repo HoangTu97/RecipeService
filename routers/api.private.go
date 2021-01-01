@@ -13,7 +13,7 @@ func registerPrivateApi(apiRoutes *gin.RouterGroup) {
 	privateRoutes.Use(middlewares.Authenticated)
 	{
 		privatePostRoutes := privateRoutes.Group("/post")
-		privatePostRoutes.Use(middlewares.HasAuthority(constants.ROLE_USER))
+		privatePostRoutes.Use(middlewares.HasAuthority(constants.ROLE.USER))
 		privatePostRoutes.POST("", config.PostController.CreatePost)
 	}
 }

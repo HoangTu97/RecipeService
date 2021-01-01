@@ -1,7 +1,8 @@
 package request
 
 import (
-	"Food/helpers/e"
+	"Food/helpers/constants"
+	"errors"
 	"fmt"
 
 	"github.com/astaxie/beego/validation"
@@ -10,23 +11,23 @@ import (
 
 // BindAndValid bind data and return error if exist.
 // @Return int errCode
-func BindAndValid(c *gin.Context, form interface{}) (int) {
+func BindAndValid(c *gin.Context, form interface{}) (error) {
 	err := c.Bind(form)
 	if err != nil {
-		return e.INVALID_REQUEST
+		return errors.New(constants.ErrorStringApi.INVALID_REQUEST)
 	}
 
 	valid := validation.Validation{}
 	check, err := valid.Valid(form)
 	if err != nil {
-		return e.ERROR
+		return errors.New(constants.ErrorStringApi.INVALID_REQUEST)
 	}
 	if !check {
 		MarkErrors(valid.Errors)
-		return e.INVALID_REQUEST
+		return errors.New(constants.ErrorStringApi.INVALID_REQUEST)
 	}
 
-	return e.SUCCESS
+	return nil
 }
 
 // MarkErrors logs error logs

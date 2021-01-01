@@ -16,8 +16,8 @@ const (
 )
 
 var toString = []string{
-	constants.ROLE_USER,
-	constants.ROLE_ADMIN,
+	constants.ROLE.USER,
+	constants.ROLE.ADMIN,
 }
 
 func (role UserRole) String() string {
