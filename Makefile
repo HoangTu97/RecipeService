@@ -1,5 +1,12 @@
-build:
-	go build -tags=jsoniter -o App
+BIN_NAME = App
 
-dev:
-	swag init && make build && ./App
+run:
+	./${BIN_NAME}
+
+build:
+	go build -tags=jsoniter -o ${BIN_NAME}
+
+docs:
+	swag init
+
+dev: docs build run
