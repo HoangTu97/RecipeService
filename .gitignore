@@ -3,8 +3,8 @@ docs/
 data/
 *.db
 
-Food
-Food.exe
+App
+App.exe
 
 .vscode
 .DS_Store

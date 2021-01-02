@@ -1,7 +1,6 @@
 package cache
 
 import (
-	"Food/helpers/setting"
 	"encoding/json"
 	"time"
 
@@ -12,7 +11,7 @@ type memCache struct {
 	conn *cache.Cache
 }
 
-func NewMem(cacheSetting setting.Cache) Cache {
+func NewMem(config Config) Cache {
 	conn := cache.New(5*time.Minute, 10*time.Minute)
 
 	return &memCache{conn: conn}

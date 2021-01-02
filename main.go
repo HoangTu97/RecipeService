@@ -8,8 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"Food/config"
-	"Food/helpers/database"
-	"Food/helpers/logging"
+	"Food/pkg/database"
+	"Food/pkg/logging"
 	"Food/routers"
 )
 
@@ -22,7 +22,7 @@ import (
 func main() {
 	config.Setup()
 
-	database, closeDB := database.NewDB(*config.DatabaseSetting)
+	database, closeDB := database.NewDB(*(*config.DatabaseSetting).Config)
 	defer closeDB()
 	database = config.SetupDB(database)
 

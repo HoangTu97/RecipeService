@@ -1,7 +1,6 @@
 package cache
 
 import (
-	"Food/helpers/setting"
 	"encoding/json"
 	"time"
 
@@ -12,18 +11,18 @@ type redisCache struct {
 	redisConn *redis.Pool
 }
 
-func NewRedis(cacheSetting setting.Cache) Cache {
+func NewRedis(config Config) Cache {
 	redisConn := &redis.Pool{
-		MaxIdle:     cacheSetting.MaxIdle,
-		MaxActive:   cacheSetting.MaxActive,
-		IdleTimeout: cacheSetting.IdleTimeout,
+		MaxIdle:     config.MaxIdle,
+		MaxActive:   config.MaxActive,
+		IdleTimeout: config.IdleTimeout,
 		Dial: func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", cacheSetting.Host)
+			c, err := redis.Dial("tcp", config.Host)
 			if err != nil {
 				return nil, err
 			}
-			if cacheSetting.Password != "" {
-				if _, err := c.Do("AUTH", cacheSetting.Password); err != nil {
+			if config.Password != "" {
+				if _, err := c.Do("AUTH", config.Password); err != nil {
 					c.Close()
 					return nil, err
 				}

@@ -1,7 +1,6 @@
 package cache
 
 import (
-	"Food/helpers/setting"
 	"Food/pkg/converter"
 	"strings"
 )
@@ -15,6 +14,16 @@ type Cache interface {
 	LikeDeletes(key string) error
 }
 
+func NewCache(config Config) Cache {
+	if config.Type == "redis" {
+		return NewRedis(config)
+	}
+	if config.Type == "memory" {
+		return NewMem(config)
+	}
+	return nil
+}
+
 func genKey(data ...interface{}) string {
 	values := make([]string, len(data))
 
@@ -23,14 +32,4 @@ func genKey(data ...interface{}) string {
 	}
 
 	return strings.Join(values, "_")
-}
-
-func NewCache(cacheSetting setting.Cache) Cache {
-	if cacheSetting.Type == "redis" {
-		return NewRedis(cacheSetting)
-	}
-	if cacheSetting.Type == "memory" {
-		return NewMem(cacheSetting)
-	}
-	return nil
 }

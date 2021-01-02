@@ -2,7 +2,6 @@ package logging
 
 import (
 	"Food/helpers/file"
-	"Food/helpers/setting"
 	"fmt"
 	"log"
 	"path/filepath"
@@ -39,9 +38,9 @@ type logger struct {
 	logger *log.Logger
 }
 
-func NewLogger(appSetting setting.Logger) Logger {
-	filePath := getLogFilePath(appSetting.RuntimeRootPath, appSetting.LogSavePath)
-	fileName := getLogFileName(appSetting.LogSaveName, appSetting.TimeFormat, appSetting.LogFileExt)
+func NewLogger(config Config) Logger {
+	filePath := getLogFilePath(config.RuntimeRootPath, config.LogSavePath)
+	fileName := getLogFileName(config.LogSaveName, config.TimeFormat, config.LogFileExt)
 	file, err := file.MustOpen(fileName, filePath)
 	if err != nil {
 		log.Fatalf("logging.Setup err: %v", err)

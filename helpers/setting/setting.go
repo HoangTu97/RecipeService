@@ -1,6 +1,11 @@
 package setting
 
-import "time"
+import (
+	"Food/pkg/cache"
+	"Food/pkg/database"
+	"Food/pkg/logging"
+	"time"
+)
 
 type App struct {
 	JwtSecret       string
@@ -8,11 +13,7 @@ type App struct {
 }
 
 type Logger struct {
-	RuntimeRootPath string
-	LogSavePath     string
-	LogSaveName     string
-	LogFileExt      string
-	TimeFormat      string
+	logging.Config
 }
 
 type Server struct {
@@ -24,23 +25,11 @@ type Server struct {
 }
 
 type Database struct {
-	Host     string
-	Port     string
-	Type     string
-	Name     string
-	User     string
-	Password string
+	*database.Config
 }
 
 type Cache struct {
-	Type        string
-	Host        string
-	Port        string
-	Password    string
-	SSL         bool
-	MaxIdle     int
-	MaxActive   int
-	IdleTimeout time.Duration
+	*cache.Config
 }
 
 type RabbitMQ struct {

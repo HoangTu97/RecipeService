@@ -2,14 +2,14 @@ package service
 
 import (
 	"Food/dto"
-	"Food/helpers/cache"
 	"Food/helpers/constants"
+	"Food/pkg/cache"
 	"encoding/json"
 )
 
 type userProxy struct {
 	service User
-	cache cache.Cache
+	cache   cache.Cache
 }
 
 func NewUserProxy(service User, cache cache.Cache) User {

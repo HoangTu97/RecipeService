@@ -2,7 +2,7 @@ package config
 
 import (
 	"Food/controller"
-	"Food/helpers/cache"
+	"Food/pkg/cache"
 	"Food/repository"
 	"Food/service"
 	"Food/service/mapper"
@@ -21,7 +21,7 @@ var (
 )
 
 func SetupController(db *gorm.DB) {
-	cache := cache.NewCache(*CacheSetting)
+	cache := cache.NewCache(*(*CacheSetting).Config)
 
 	cateMapper := mapper.NewCategory()
 	commentMapper := mapper.NewComment()

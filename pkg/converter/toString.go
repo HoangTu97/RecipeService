@@ -75,7 +75,7 @@ func Int2HexStr(num int) (hex string) {
 	for num > 0 {
 		r := num % 16
 
-		c := "?"
+		var c string
 		if r >= 0 && r <= 9 {
 			c = string(rune(r + '0'))
 		} else {

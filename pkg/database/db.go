@@ -1,7 +1,6 @@
 package database
 
 import (
-	"Food/helpers/setting"
 	"fmt"
 	"log"
 
@@ -10,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func NewDB(config setting.Database) (*gorm.DB, func()) {
+func NewDB(config Config) (*gorm.DB, func()) {
 	var dialector gorm.Dialector
 
 	switch config.Type {
@@ -24,6 +23,8 @@ func NewDB(config setting.Database) (*gorm.DB, func()) {
 				config.Password,
 				config.Name),
 		})
+	default:
+		log.Fatalln("NewDB -> config invalid -> ", config)
 	}
 
 	db, err := gorm.Open(dialector, &gorm.Config{})

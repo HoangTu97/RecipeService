@@ -2,6 +2,8 @@ package config
 
 import (
 	"Food/helpers/setting"
+	"Food/pkg/cache"
+	"Food/pkg/database"
 	"log"
 	"time"
 
@@ -11,25 +13,23 @@ import (
 var AppSetting = &setting.App{}
 var LoggerSetting = &setting.Logger{}
 var ServerSetting = &setting.Server{}
-var DatabaseSetting = &setting.Database{}
-var CacheSetting = &setting.Cache{}
+var DatabaseSetting = &setting.Database{Config: &database.Config{}}
+var CacheSetting = &setting.Cache{Config: &cache.Config{}}
 var RabbitMQSetting = &setting.RabbitMQ{}
-
-var cfg *ini.File
 
 // Setup initialize the configuration instance
 func Setup() {
 	var err error
-	cfg, err = ini.Load("app.ini")
+	cfg, err := ini.Load("app.ini")
 	if err != nil {
 		log.Fatalf("setting.Setup, fail to parse 'app.ini': %v", err)
 	}
 
-	mapTo("app", AppSetting)
-	mapTo("logger", LoggerSetting)
-	mapTo("server", ServerSetting)
-	mapTo("database", DatabaseSetting)
-	mapTo("cache", CacheSetting)
+	mapTo(cfg, "app", AppSetting)
+	mapTo(cfg, "logger", LoggerSetting)
+	mapTo(cfg, "server", ServerSetting)
+	mapTo(cfg, "database", DatabaseSetting.Config)
+	mapTo(cfg, "cache", CacheSetting.Config)
 
 	ServerSetting.ReadTimeout = ServerSetting.ReadTimeout * time.Second
 	ServerSetting.WriteTimeout = ServerSetting.WriteTimeout * time.Second
@@ -37,7 +37,7 @@ func Setup() {
 }
 
 // mapTo map section
-func mapTo(section string, v interface{}) {
+func mapTo(cfg *ini.File, section string, v interface{}) {
 	err := cfg.Section(section).MapTo(v)
 	if err != nil {
 		log.Fatalf("Cfg.MapTo %s err: %v", section, err)
