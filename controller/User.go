@@ -6,6 +6,7 @@ import (
 	UserRequest "Food/dto/request/user"
 	"Food/dto/response"
 	UserResponse "Food/dto/response/user"
+	"Food/helpers/constants"
 	"Food/helpers/jwt"
 	"Food/service"
 
@@ -42,7 +43,7 @@ func (r *user) Register(c *gin.Context) {
 
 	_, checkRegistered := r.service.FindOneByUsername(registerDTO.Username)
 	if checkRegistered {
-		response.CreateErrorResponse(c, "USER_EXISTED")
+		response.CreateErrorResponse(c, constants.ErrorStringApi.USER_EXISTED)
 		return
 	}
 
@@ -50,13 +51,13 @@ func (r *user) Register(c *gin.Context) {
 
 	userDTO, isSuccess := r.service.Create(userDTO)
 	if !isSuccess {
-		response.CreateErrorResponse(c, "Register failed!!!")
+		response.CreateErrorResponse(c, constants.ErrorStringApi.INTERNAL_ERROR)
 		return
 	}
 
 	tokenString, error := jwt.GenerateToken(userDTO.UserID, userDTO.Name, userDTO.GetRolesStr())
 	if error != nil {
-		response.CreateErrorResponse(c, "INTERNAL_ERROR")
+		response.CreateErrorResponse(c, constants.ErrorStringApi.USER_TOKEN_GEN_FAILED)
 		return
 	}
 
@@ -82,13 +83,13 @@ func (r *user) Login(c *gin.Context) {
 
 	userDTO, isSuccess := r.service.FindOneLogin(loginDTO.Username, loginDTO.Password)
 	if !isSuccess {
-		response.CreateErrorResponse(c, "UNAUTHORIZED")
+		response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
 		return
 	}
 
 	tokenString, err := r.service.GetUserToken(userDTO)
 	if err != nil {
-		response.CreateErrorResponse(c, "ERROR_GEN_TOKEN")
+		response.CreateErrorResponse(c, constants.ErrorStringApi.USER_TOKEN_GEN_FAILED)
 		return
 	}
 
