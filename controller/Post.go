@@ -20,8 +20,8 @@ type Post interface {
 }
 
 type post struct {
-	service service.Post
-	userService service.User
+	service       service.Post
+	userService   service.User
 	recipeService service.Recipe
 }
 
@@ -70,10 +70,11 @@ func (r *post) CreatePost(c *gin.Context) {
 	}
 
 	recipeDTO := dto.RecipeDTO{
-		Image: requestDTO.RecipeImage,
-		Name: requestDTO.RecipeName,
-		Duration: requestDTO.RecipeDuration,
+		Image:       requestDTO.RecipeImage,
+		Name:        requestDTO.RecipeName,
+		Duration:    requestDTO.RecipeDuration,
 		Description: "Nguyên liệu:\n-" + strings.Join(requestDTO.RecipeIngredients, "\n-") + "\nCách làm:\n-" + strings.Join(requestDTO.RecipeSteps, "\n-"),
+		Steps:       requestDTO.RecipeSteps,
 	}
 
 	var success bool
@@ -84,10 +85,10 @@ func (r *post) CreatePost(c *gin.Context) {
 	}
 
 	postDTO := dto.PostDTO{
-		UserID: userDTO.ID,
-		Photo: requestDTO.RecipeImage,
+		UserID:      userDTO.ID,
+		Photo:       requestDTO.RecipeImage,
 		Description: requestDTO.Description,
-		HashTags: requestDTO.HashTags,
+		HashTags:    requestDTO.HashTags,
 
 		RecipeID: recipeDTO.ID,
 	}

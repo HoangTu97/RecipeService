@@ -12,6 +12,7 @@ type RecipeDTO struct {
 	Image       string
 	Photos      []string
 	Duration    uint32
+	Steps       []string
 
 	CreatedAt time.Time
 	UpdatedAt time.Time

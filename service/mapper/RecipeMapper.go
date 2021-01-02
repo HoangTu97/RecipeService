@@ -14,7 +14,7 @@ type Recipe interface {
 	ToDTOSInterfaceFromEntitiesInterface(interfaces []interface{}) []interface{}
 }
 
-type recipe struct {}
+type recipe struct{}
 
 func NewRecipe() Recipe {
 	return &recipe{}
@@ -31,6 +31,7 @@ func (m *recipe) ToDTO(entity models.Recipe) dto.RecipeDTO {
 		Description: entity.Description,
 		Duration:    entity.Duration,
 		Photos:      converter.MustArrStr(entity.Photos),
+		Steps:       converter.MustArrStr(entity.Steps),
 	}
 }
 
@@ -45,6 +46,7 @@ func (m *recipe) ToEntity(dto dto.RecipeDTO) models.Recipe {
 		Description: dto.Description,
 		Duration:    dto.Duration,
 		Photos:      converter.ToStr(dto.Photos),
+		Steps:       converter.ToStr(dto.Steps),
 	}
 }
 

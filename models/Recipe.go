@@ -6,13 +6,15 @@ import (
 
 // Recipe entity
 type Recipe struct {
-	ID                uint   `gorm:"primary_key"`
-	Name              string `gorm:"type:varchar(255)"`
-	Description       string `gorm:"type:text"`
-	Image             string `gorm:"type:varchar(255)"`
-	Photos            string `gorm:"type:text"`
-	Duration          uint32
-	Categories        []Category   `gorm:"many2many:cate_recipes;"`
+	ID          uint   `gorm:"primary_key"`
+	Name        string `gorm:"type:varchar(255)"`
+	Description string `gorm:"type:text"`
+	Image       string `gorm:"type:varchar(255)"`
+	Photos      string `gorm:"type:text"`
+	Duration    uint32
+	Steps       string `gorm:"type:text"`
+
+	Categories        []Category `gorm:"many2many:cate_recipes;"`
 	RecipeIngredients []RecipeIngredients
 
 	CreatedAt time.Time
