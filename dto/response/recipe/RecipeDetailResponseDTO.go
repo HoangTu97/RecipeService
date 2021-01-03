@@ -19,6 +19,7 @@ type RecipeDetailResponseDTO struct {
 	Duration    uint32                         `json:"duration"`
 	Description string                         `json:"description"`
 	Categories  []RecipeDetail_CateResponseDTO `json:"categories"`
+	Steps       []string                       `json:"steps"`
 }
 
 // CreateRecipeDetailResponseDTO godoc
@@ -39,5 +40,6 @@ func CreateRecipeDetailResponseDTO(recipe models.Recipe) RecipeDetailResponseDTO
 		Duration:    recipe.Duration,
 		Description: recipe.Description,
 		Categories:  cates,
+		Steps:       converter.MustArrStr(recipe.Steps),
 	}
 }
