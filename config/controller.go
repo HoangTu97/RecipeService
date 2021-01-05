@@ -20,9 +20,7 @@ var (
 	UserController controller.User
 )
 
-func SetupController(db *gorm.DB) {
-	cache := cache.NewCache(*(*CacheSetting).Config)
-
+func SetupController(db *gorm.DB, cache cache.Cache) {
 	cateMapper := mapper.NewCategory()
 	commentMapper := mapper.NewComment()
 	ingredientMapper := mapper.NewIngredient()

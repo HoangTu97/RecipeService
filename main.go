@@ -30,7 +30,10 @@ func main() {
 	logging.NewZeroLog()
 
 	config.SetupJWT(*config.AppSetting)
-	config.SetupController(database)
+
+	cache := cache.NewCache(*(*config.CacheSetting).Config)
+
+	config.SetupController(database, cache)
 
 	gin.ForceConsoleColor()
 	gin.SetMode(config.ServerSetting.RunMode)
