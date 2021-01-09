@@ -1,6 +1,7 @@
 package converter
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -53,7 +54,11 @@ func ToStr(value interface{}, args ...int) (s string) {
 	case []string:
 		s = strings.Join(v, ",")
 	default:
-		s = fmt.Sprintf("%v", v)
+		b, err := json.MarshalIndent(v, "", "  ")
+		if err != nil {
+			fmt.Println(err)
+		}
+		s = string(b)
 	}
 	return s
 }
