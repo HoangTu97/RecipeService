@@ -19,6 +19,7 @@ func InitRouter(jwtManager jwt.JwtManager) *gin.Engine {
 	// r.Use(include.CORS())
 
 	r.Use(middlewares.JWT(jwtManager))
+	r.Use(middlewares.Security)
 
 	r.Use(static.Serve("/", static.LocalFile("./client/build", true)))
 

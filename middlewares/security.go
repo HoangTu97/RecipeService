@@ -4,36 +4,45 @@ import (
 	"Food/domain"
 	"Food/dto/response"
 	"Food/helpers/constants"
-	"regexp"
 
 	"github.com/gin-gonic/gin"
 )
 
+var accessibleRoles map[string][]string
+
+func init() {
+	accessibleRoles = make(map[string][]string)
+	accessibleRoles["/api/private/post"] = []string{constants.ROLE.USER}
+}
+
 // Security is Security middleware
 func Security(c *gin.Context) {
-
-	if regexp.MustCompile(`/api/public/.*`).Match([]byte(c.Request.URL.Path)) {
+	roles, found := accessibleRoles[c.Request.URL.Path]
+	if !found {
 		c.Next()
 		return
 	}
 
-	if regexp.MustCompile(`/api/private/.*`).Match([]byte(c.Request.URL.Path)) {
-		iUserInfo, exists := c.Get("UserInfo")
-		if !exists {
-			response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
-			c.Abort()
-			return
-		}
-
-		userInfo := iUserInfo.(*domain.Token)
-		if err := userInfo.Valid(); err != nil {
-			response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
-			c.Abort()
-			return
-		}
-
-		c.Next()
+	iUserInfo, exists := c.Get("UserInfo")
+	if !exists {
+		response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
+		c.Abort()
 		return
+	}
+
+	userInfo := iUserInfo.(*domain.Token)
+	if err := userInfo.Valid(); err != nil {
+		response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
+		c.Abort()
+		return
+	}
+
+	for _, authority := range roles {
+		if !userInfo.HasAuthority(authority) {
+			response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
+			c.Abort()
+			return
+		}
 	}
 
 	c.Next()
