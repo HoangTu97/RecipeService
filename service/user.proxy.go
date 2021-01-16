@@ -100,3 +100,7 @@ func (s *userProxy) FindOneByUsername(username string) (dto.UserDTO, bool) {
 
 	return userDTO, true
 }
+
+func (s *userProxy) GenerateToken(userID string, username string, roles []string) (string, error) {
+	return s.service.GenerateToken(userID, username, roles)
+}

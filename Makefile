@@ -1,6 +1,8 @@
 BIN_NAME = App
 BIN_PATH = ./build/${BIN_NAME}
 
+.PHONY: build
+
 dep:
 	go get -u github.com/swaggo/swag/cmd/swag
 

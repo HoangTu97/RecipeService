@@ -16,15 +16,17 @@ type User interface {
 	FindOneLogin(username string, password string) (dto.UserDTO, bool)
 	FindOneByUserID(userId string) (dto.UserDTO, bool)
 	FindOneByUsername(username string) (dto.UserDTO, bool)
+	GenerateToken(userID string, username string, roles []string) (string, error)
 }
 
 type user struct {
 	repository repository.User
 	mapper     mapper.User
+	jwtManager jwt.JwtManager
 }
 
-func NewUser(repository repository.User, mapper mapper.User) User {
-	return &user{repository: repository, mapper: mapper}
+func NewUser(repository repository.User, mapper mapper.User, jwtManager jwt.JwtManager) User {
+	return &user{repository: repository, mapper: mapper, jwtManager: jwtManager}
 }
 
 func (s *user) Create(userDTO dto.UserDTO) (dto.UserDTO, bool) {
@@ -42,7 +44,7 @@ func (s *user) Create(userDTO dto.UserDTO) (dto.UserDTO, bool) {
 }
 
 func (s *user) GetUserToken(userDTO dto.UserDTO) (string, error) {
-	tokenString, err := jwt.GenerateToken(userDTO.UserID, userDTO.Name, userDTO.GetRolesStr())
+	tokenString, err := s.jwtManager.GenerateToken(userDTO.UserID, userDTO.Name, userDTO.GetRolesStr())
 	if err != nil {
 		return "", err
 	}
@@ -80,4 +82,8 @@ func (s *user) FindOneByUsername(username string) (dto.UserDTO, bool) {
 	}
 
 	return s.mapper.ToDTO(user), true
+}
+
+func (s *user) GenerateToken(userID string, username string, roles []string) (string, error) {
+	return s.jwtManager.GenerateToken(userID, username, roles)
 }

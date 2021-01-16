@@ -7,7 +7,6 @@ import (
 	"Food/dto/response"
 	UserResponse "Food/dto/response/user"
 	"Food/helpers/constants"
-	"Food/helpers/jwt"
 	"Food/service"
 
 	"github.com/gin-gonic/gin"
@@ -55,7 +54,7 @@ func (r *user) Register(c *gin.Context) {
 		return
 	}
 
-	tokenString, error := jwt.GenerateToken(userDTO.UserID, userDTO.Name, userDTO.GetRolesStr())
+	tokenString, error := r.service.GenerateToken(userDTO.UserID, userDTO.Name, userDTO.GetRolesStr())
 	if error != nil {
 		response.CreateErrorResponse(c, constants.ErrorStringApi.USER_TOKEN_GEN_FAILED)
 		return
