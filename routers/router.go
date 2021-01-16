@@ -2,6 +2,7 @@ package routers
 
 import (
 	_ "Food/docs"
+	"Food/helpers/jwt"
 	"Food/middlewares"
 
 	"github.com/gin-gonic/contrib/static"
@@ -11,13 +12,13 @@ import (
 )
 
 // InitRouter initialize routing information
-func InitRouter() *gin.Engine {
+func InitRouter(jwtManager jwt.JwtManager) *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	// r.Use(include.CORS())
 
-	r.Use(middlewares.JWT)
+	r.Use(middlewares.JWT(jwtManager))
 
 	r.Use(static.Serve("/", static.LocalFile("./client/build", true)))
 

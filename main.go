@@ -29,13 +29,14 @@ func main() {
 	// logging.NewLogger(*config.LoggerSetting)
 	logging.NewZeroLog()
 
-	config.SetupJWT(*config.AppSetting)
-	config.SetupController(database)
+	jwtManager := config.SetupJWT(*config.AppSetting)
+
+	config.SetupController(database, jwtManager)
 
 	gin.ForceConsoleColor()
 	gin.SetMode(config.ServerSetting.RunMode)
 
-	router := routers.InitRouter()
+	router := routers.InitRouter(jwtManager)
 
 	readTimeout := config.ServerSetting.ReadTimeout
 	writeTimeout := config.ServerSetting.WriteTimeout

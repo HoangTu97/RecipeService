@@ -2,6 +2,7 @@ package config
 
 import (
 	"Food/controller"
+	"Food/helpers/jwt"
 	"Food/pkg/cache"
 	"Food/repository"
 	"Food/service"
@@ -20,7 +21,7 @@ var (
 	UserController controller.User
 )
 
-func SetupController(db *gorm.DB) {
+func SetupController(db *gorm.DB, jwtManager jwt.JwtManager) {
 	cache := cache.NewCache(*(*CacheSetting).Config)
 
 	cateMapper := mapper.NewCategory()
@@ -48,7 +49,7 @@ func SetupController(db *gorm.DB) {
 	recipeIngreService := service.NewRecipeIngredients(recipeIngreRepo, recipeIngreMapper)
 	recipeService := service.NewRecipe(recipeRepo, recipeMapper)
 	// userRecipeInteractService := service.NewUser(userRecipeInteractRepo)
-	userService := service.NewUser(userRepo, userMapper)
+	userService := service.NewUser(userRepo, userMapper, jwtManager)
 
 	userServiceProxy := service.NewUserProxy(userService, cache)
 
