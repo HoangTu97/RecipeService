@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"Food/config"
+	"Food/pkg/cache"
 	"Food/pkg/database"
 	"Food/pkg/logging"
 	"Food/routers"
