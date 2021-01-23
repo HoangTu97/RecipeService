@@ -12,6 +12,7 @@ import (
 )
 
 var (
+	// Controllers globale declare
 	CateController controller.Category
 	CommentController controller.Comment
 	ImageController controller.Image
@@ -19,9 +20,11 @@ var (
 	PostController controller.Post
 	RecipeController controller.Recipe
 	UserController controller.User
+	// Controllers globale declare end : dont remove
 )
 
 func SetupController(db *gorm.DB, jwtManager jwt.JwtManager, cache cache.Cache) {
+	// Mappers declare
 	cateMapper := mapper.NewCategory()
 	commentMapper := mapper.NewComment()
 	ingredientMapper := mapper.NewIngredient()
@@ -29,7 +32,9 @@ func SetupController(db *gorm.DB, jwtManager jwt.JwtManager, cache cache.Cache) 
 	recipeIngreMapper := mapper.NewRecipeIngredient()
 	recipeMapper := mapper.NewRecipe()
 	userMapper := mapper.NewUser()
+	// Mappers declare end : dont remove
 
+	// Repositories declare
 	cateRepo := repository.NewCategory(db)
 	commentRepo := repository.NewComment(db)
 	ingreRepo := repository.NewIngredient(db)
@@ -38,7 +43,12 @@ func SetupController(db *gorm.DB, jwtManager jwt.JwtManager, cache cache.Cache) 
 	recipeRepo := repository.NewRecipe(db)
 	// userRecipeInteractRepo := repository.NewUserRecipeInteraction(db)
 	userRepo := repository.NewUser(db)
+	// Repositories declare end : dont remove
 
+	// Proxy Repositories declare
+	// Proxy Repositories declare end : dont remove
+
+	// Services declare
 	cateService := service.NewCategory(cateRepo, cateMapper)
 	commentService := service.NewComment(commentRepo, commentMapper)
 	imageService := service.NewImage()
@@ -48,8 +58,11 @@ func SetupController(db *gorm.DB, jwtManager jwt.JwtManager, cache cache.Cache) 
 	recipeService := service.NewRecipe(recipeRepo, recipeMapper)
 	// userRecipeInteractService := service.NewUser(userRecipeInteractRepo)
 	userService := service.NewUser(userRepo, userMapper, jwtManager)
+	// Services declare end : dont remove
 
+	// Proxy Services declare
 	userServiceProxy := service.NewUserProxy(userService, cache)
+	// Proxy Services declare end : dont remove
 
 	CateController = controller.NewCategory(cateService)
 	CommentController = controller.NewComment(commentService, postService)

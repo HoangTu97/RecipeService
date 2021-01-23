@@ -8,6 +8,7 @@ import (
 
 func registerPublicApi(apiRoutes *gin.RouterGroup) {
 	publicRoutes := apiRoutes.Group("/public")
+	// Api declare
 	{
 		publicCategoryRoutes := publicRoutes.Group("/category")
 		publicCategoryRoutes.GET("/getAll", config.CateController.GetAll)
@@ -44,4 +45,5 @@ func registerPublicApi(apiRoutes *gin.RouterGroup) {
 		publicCommentRoutes := publicRoutes.Group("/comment")
 		publicCommentRoutes.GET("/:postId", config.CommentController.GetByPostID)
 	}
+	// Api declare end : dont remove
 }

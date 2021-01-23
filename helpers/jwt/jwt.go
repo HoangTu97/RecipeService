@@ -1,7 +1,7 @@
 package jwt
 
 import (
-	"Food/domain"
+	"Food/pkg/domain"
 	"Food/helpers/setting"
 	"Food/pkg/util"
 	"time"

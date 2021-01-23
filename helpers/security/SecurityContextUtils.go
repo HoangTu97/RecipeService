@@ -1,7 +1,7 @@
 package security
 
 import (
-	"Food/domain"
+	"Food/pkg/domain"
 
 	"github.com/gin-gonic/gin"
 )

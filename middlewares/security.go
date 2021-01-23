@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"Food/domain"
+	"Food/pkg/domain"
 	"Food/dto/response"
 	"Food/helpers/constants"
 
@@ -12,7 +12,10 @@ var accessibleRoles map[string][]string
 
 func init() {
 	accessibleRoles = make(map[string][]string)
+	// Security declare
+  accessibleRoles["/api/private/user.*"] = []string{constants.ROLE.USER}
 	accessibleRoles["/api/private/post"] = []string{constants.ROLE.USER}
+	// Security declare end : dont remove
 }
 
 // Security is Security middleware

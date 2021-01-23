@@ -1,7 +1,7 @@
 package mapper
 
 import (
-	"Food/domain"
+	"Food/pkg/domain"
 	"Food/dto"
 	"Food/models"
 	"Food/pkg/converter"

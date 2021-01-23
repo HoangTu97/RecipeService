@@ -1,7 +1,7 @@
 package service
 
 import (
-	"Food/domain"
+	"Food/pkg/domain"
 	"Food/dto"
 	"Food/helpers/jwt"
 	"Food/repository"

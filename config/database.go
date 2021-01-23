@@ -52,6 +52,7 @@ func SetupDB(db *gorm.DB) *gorm.DB {
 
 func migrateDB(db *gorm.DB) {
 	_ = db.AutoMigrate(
+		// Models declare
 		&models.Category{},
 		&models.Recipe{},
 		&models.Ingredient{},
@@ -60,6 +61,7 @@ func migrateDB(db *gorm.DB) {
 		&models.UserRecipeInteraction{},
 		&models.Post{},
 		&models.Comment{},
+		// Models declare end : dont remove
 	)
 }
 

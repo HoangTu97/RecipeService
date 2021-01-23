@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"Food/domain"
+	"Food/pkg/domain"
 	"time"
 )
 
