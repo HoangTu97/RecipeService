@@ -1,40 +1,40 @@
 package setting
 
 import (
-	"Food/pkg/cache"
-	"Food/pkg/database"
-	"Food/pkg/logging"
-	"time"
+  "Food/pkg/cache"
+  "Food/pkg/database"
+  "Food/pkg/logging"
+  "time"
 )
 
 type App struct {
-	JwtSecret       string
-	PageSize        int
+  JwtSecret       string
+  PageSize        int
 }
 
 type Logger struct {
-	logging.Config
+  logging.Config
 }
 
 type Server struct {
-	RunMode      string
-	HTTPPort     string
-	SSL          bool
-	ReadTimeout  time.Duration
-	WriteTimeout time.Duration
+  RunMode      string
+  HTTPPort     string
+  SSL          bool
+  ReadTimeout  time.Duration
+  WriteTimeout time.Duration
 }
 
 type Database struct {
-	*database.Config
+  *database.Config
 }
 
 type Cache struct {
-	*cache.Config
+  *cache.Config
 }
 
 type RabbitMQ struct {
-	Host     string
-	Port     string
-	User     string
-	Password string
+  Host     string
+  Port     string
+  User     string
+  Password string
 }

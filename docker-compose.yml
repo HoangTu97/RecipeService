@@ -53,5 +53,5 @@ volumes:
   dbdata:
     driver_opts: 
       o: bind
-      device: /Users/nguyenxuanhoangtu/Documents/projet/smartHome/server/Services/Food/data/db/
+      device: /Users/nguyenxuanhoangtu/Documents/projet/RecipeService/data/db/
       type: bind

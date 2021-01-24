@@ -1,7 +1,7 @@
-BIN_NAME = App
+BIN_NAME = Food
 BIN_PATH = ./build/${BIN_NAME}
 
-.PHONY: build
+.PHONY: docs build run
 
 dep:
 	go get -u github.com/swaggo/swag/cmd/swag
@@ -14,5 +14,8 @@ build:
 
 docs:
 	swag init
+
+cert:
+	mkdir cert && generate-certificate.sh
 
 dev: docs build run

@@ -1,84 +1,94 @@
 package middlewares
 
 import (
-	"Food/pkg/domain"
-	"Food/dto/response"
-	"Food/helpers/constants"
+  "Food/pkg/domain"
+  "Food/dto/response"
+  "Food/helpers/constants"
+  "regexp"
 
-	"github.com/gin-gonic/gin"
+  "github.com/gin-gonic/gin"
 )
 
 var accessibleRoles map[string][]string
 
 func init() {
-	accessibleRoles = make(map[string][]string)
-	// Security declare
+  accessibleRoles = make(map[string][]string)
+  // Security declare
   accessibleRoles["/api/private/user.*"] = []string{constants.ROLE.USER}
-	accessibleRoles["/api/private/post"] = []string{constants.ROLE.USER}
-	// Security declare end : dont remove
+  // Security declare end : dont remove
 }
 
 // Security is Security middleware
 func Security(c *gin.Context) {
-	roles, found := accessibleRoles[c.Request.URL.Path]
-	if !found {
-		c.Next()
-		return
-	}
+  var roles []string
+  found := false
+  pathBytes := []byte(c.Request.URL.Path)
+  for path, _roles := range accessibleRoles {
+    if regexp.MustCompile(path).Match(pathBytes) {
+      roles = _roles
+      found = true
+      break
+    }
+  }
 
-	iUserInfo, exists := c.Get("UserInfo")
-	if !exists {
-		response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
-		c.Abort()
-		return
-	}
+  if !found {
+    c.Next()
+    return
+  }
 
-	userInfo := iUserInfo.(*domain.Token)
-	if err := userInfo.Valid(); err != nil {
-		response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
-		c.Abort()
-		return
-	}
+  iUserInfo, exists := c.Get("UserInfo")
+  if !exists {
+    response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
+    c.Abort()
+    return
+  }
 
-	for _, authority := range roles {
-		if !userInfo.HasAuthority(authority) {
-			response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
-			c.Abort()
-			return
-		}
-	}
+  userInfo := iUserInfo.(*domain.Token)
+  if err := userInfo.Valid(); err != nil {
+    response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
+    c.Abort()
+    return
+  }
 
-	c.Next()
+  for _, authority := range roles {
+    if !userInfo.HasAuthority(authority) {
+      response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
+      c.Abort()
+      return
+    }
+  }
+
+  c.Next()
 }
 
 // Authenticated Authenticated
 func Authenticated(c *gin.Context) {
-	iUserInfo, exists := c.Get("UserInfo")
-	if !exists {
-		response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
-		c.Abort()
-		return
-	}
+  iUserInfo, exists := c.Get("UserInfo")
+  if !exists {
+    response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
+    c.Abort()
+    return
+  }
 
-	userInfo := iUserInfo.(*domain.Token)
-	if err := userInfo.Valid(); err != nil {
-		response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
-		c.Abort()
-		return
-	}
+  userInfo := iUserInfo.(*domain.Token)
+  if err := userInfo.Valid(); err != nil {
+    response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
+    c.Abort()
+    return
+  }
 
-	c.Next()
+  c.Next()
 }
 
 // HasAuthority HasAuthority
 func HasAuthority(authority string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		userInfo := c.MustGet("UserInfo").(*domain.Token)
-		if !userInfo.HasAuthority(authority) {
-			response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
-			c.Abort()
-			return
-		}
-		c.Next()
-	}
+  return func(c *gin.Context) {
+    userInfo := c.MustGet("UserInfo").(*domain.Token)
+    if !userInfo.HasAuthority(authority) {
+      response.CreateErrorResponse(c, constants.ErrorStringApi.UNAUTHORIZED_ACCESS)
+      c.Abort()
+      return
+    }
+    c.Next()
+  }
 }

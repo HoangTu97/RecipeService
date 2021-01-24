@@ -1,23 +1,15 @@
-package service
+package service_impl
 
 import (
   "Food/pkg/domain"
   "Food/dto"
   "Food/helpers/jwt"
   "Food/repository"
+  "Food/service"
   "Food/service/mapper"
 
   "golang.org/x/crypto/bcrypt"
 )
-
-type User interface {
-  Create(userDTO dto.UserDTO) (dto.UserDTO, bool)
-  GetUserToken(userDTO dto.UserDTO) (string, error)
-  FindOneLogin(username string, password string) (dto.UserDTO, bool)
-  FindOneByUserID(userId string) (dto.UserDTO, bool)
-  FindOneByUsername(username string) (dto.UserDTO, bool)
-  GenerateToken(userID string, username string, roles []string) (string, error)
-}
 
 type user struct {
   repository repository.User
@@ -25,7 +17,7 @@ type user struct {
   jwtManager jwt.JwtManager
 }
 
-func NewUser(repository repository.User, mapper mapper.User, jwtManager jwt.JwtManager) User {
+func NewUser(repository repository.User, mapper mapper.User, jwtManager jwt.JwtManager) service.User {
   return &user{repository: repository, mapper: mapper, jwtManager: jwtManager}
 }
 

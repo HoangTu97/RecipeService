@@ -2,5 +2,5 @@ package user
 
 // LoginResponseDTO godoc
 type LoginResponseDTO struct {
-	Token string `json:"token"`
+  Token string `json:"token"`
 }
