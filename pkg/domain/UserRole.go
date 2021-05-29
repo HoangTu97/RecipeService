@@ -1,7 +1,7 @@
 package domain
 
 import (
-  "Food/helpers/constants"
+  "p2/helpers/constants"
   "bytes"
   "database/sql/driver"
   "encoding/json"

@@ -1,8 +1,9 @@
 package dto
 
 import (
-  "Food/pkg/domain"
+  "p2/pkg/domain"
   "time"
+  "gorm.io/gorm"
 )
 
 // UserDTO godoc
@@ -24,7 +25,7 @@ type UserDTO struct {
 
   CreatedAt time.Time  `json:"createdAt"`
   UpdatedAt time.Time  `json:"updatedAt"`
-  DeletedAt *time.Time `json:"deletedAt"`
+  DeletedAt gorm.DeletedAt `json:"deletedAt"`
 }
 
 func (dto *UserDTO) GetRolesInterface() []interface{} {
@@ -46,19 +47,3 @@ func (dto *UserDTO) GetRolesStr() []string {
 
   return arr
 }
-
-// func (dto *UserDTO) UnmarshalJSON(data []byte) error {
-// 	var v map[string]string
-// 	err := json.Unmarshal(data, &v)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	roles := []int(v["roles"])
-// 	dto.Roles = make([]domain.UserRole, len(roles))
-// 	for i, role := range roles {
-// 		dto.Roles[i] = domain.UserRole(role)
-// 	}
-
-// 	return nil
-// }

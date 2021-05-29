@@ -1,37 +1,15 @@
 package config
 
 import (
-  "log"
-
-  "gorm.io/gorm"
-
-  "Food/models"
+  "p2/models"
 )
 
-type DB interface {
-  AutoMigrate(dst ...interface{}) error
-}
-
-// Setup initializes the database instance
-func SetupDB(db *gorm.DB) *gorm.DB {
-  sqlDB, errSqlDB := db.DB()
-  if errSqlDB != nil {
-    log.Fatalf("models.Setup db.DB() err: %v", errSqlDB)
-  }
-
-  sqlDB.SetMaxIdleConns(10)
-  sqlDB.SetMaxOpenConns(100)
-  sqlDB.Stats()
-
-  migrateDB(db)
-
-  return db
-}
-
-func migrateDB(db *gorm.DB) {
-  _ = db.AutoMigrate(
+func GetModelsNeedMigrate() []interface{} {
+  return []interface{}{
     // Models declare
     &models.User{},
+    &models.Link{},
+    &models.Click{},
     // Models declare end : dont remove
-  )
+  }
 }

@@ -1,0 +1,60 @@
+{
+  "enumerations": [
+  ],
+  "models": [
+    {
+      "name": "Conversation",
+      "fields": [
+        { "name": "Name", "type": "string" },
+        { "name": "Status", "type": "int" },
+        { "name": "DisplayId", "type": "int" },
+        { "name": "IsLocked", "type": "bool" },
+        { "name": "AdditionalAttributes", "type": "text" }
+      ],
+      "indexes": [
+        [ "account_id", "display_id" ]
+      ]
+    },
+    {
+      "name": "Participant",
+      "fields": [
+        { "name": "LastRead", "type": "uint32" }
+      ]
+    },
+    {
+      "name": "Message",
+      "fields": [
+        { "name": "Bucket", "type": "uint32" },
+        { "name": "MessageType", "type": "int" },
+        { "name": "Content", "type": "text" },
+        { "name": "ContentType", "type": "int" },
+        { "name": "ContentAttributes", "type": "text" },
+        { "name": "IsPrivate", "type": "bool" },
+        { "name": "Status", "type": "int" }
+      ]
+    },
+    {
+      "name": "Attachment",
+      "fields": [
+        { "name": "FileType", "type": "int" },
+        { "name": "ExternalUrl", "type": "string" },
+        { "name": "CoordinatesLat", "type": "float32" },
+        { "name": "CoordinatesLong", "type": "float32" },
+        { "name": "FallbackTitle", "type": "text" },
+        { "name": "Extension", "type": "string" }
+      ]
+    }
+  ],
+  "relationships": [
+    { "from": "Conversation", "to": "Message", "type": "hasMany" },
+    { "from": "Conversation", "to": "Participant", "type": "hasMany" },
+    { "from": "Message", "to": "User", "type": "belongsTo" },
+    { "from": "Message", "to": "Conversation", "type": "belongsTo" },
+    { "from": "Message", "to": "Attachment", "type": "hasMany" },
+    { "from": "Participant", "to": "User", "type": "belongsTo" },
+    { "from": "Participant", "to": "Conversation", "type": "belongsTo" },
+    { "from": "Attachment", "to": "Message", "type": "belongsTo" }
+  ],
+  "useRepoProxy": false,
+  "useServiceProxy": false
+}

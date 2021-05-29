@@ -1,7 +1,7 @@
 package request
 
 import (
-  "Food/helpers/constants"
+  "p2/helpers/constants"
   "errors"
   "fmt"
 

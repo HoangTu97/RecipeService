@@ -1,49 +1,62 @@
 package main
 
 import (
+  "context"
   "fmt"
   "log"
   "net/http"
+  "os"
+  "os/signal"
+  "syscall"
+  "time"
 
+  "github.com/spf13/viper"
   "github.com/gin-gonic/gin"
 
-  "Food/config"
-  "Food/pkg/cache"
-  "Food/pkg/database"
-  "Food/pkg/logging"
-  "Food/routers"
+  "p2/config"
+  "p2/pkg/service/Cache"
+  "p2/pkg/service/Database"
+  "p2/pkg/service/Jwt"
+  "p2/pkg/service/Mail"
+  "p2/pkg/service/Log"
+  "p2/routers"
 )
 
-// @title Food API
+// @title p2 API
 // @version 1.0
 // @description An example of gin
+// @host localhost:8080
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name Authorization
 func main() {
-  config.Setup()
+  viper.SetConfigName("config")
+  viper.AddConfigPath(".")
+  err := viper.ReadInConfig() // Find and read the config file
+  if err != nil { // Handle errors reading the config file
+    panic(fmt.Errorf("Fatal error config file: %s \n", err))
+  }
 
-  database, closeDB := database.NewDB(*(*config.DatabaseSetting).Config)
-  defer closeDB()
-  database = config.SetupDB(database)
+  dbManager := Database.NewManager()
+  models := config.GetModelsNeedMigrate()
+  dbManager.Migrate("", models)
 
-  // logging.NewLogger(*config.LoggerSetting)
-  logging.NewZeroLog()
+  logManager := Log.NewManager()
+  logger := logManager.Driver("")
+  cacheManager := Cache.NewManager(logger)
+  mailManager := Mail.NewManager(logger)
+  jwtManager := Jwt.NewManager()
 
-  cache := cache.NewCache(*(*config.CacheSetting).Config)
-
-  jwtManager := config.SetupJWT(*config.AppSetting)
-
-  config.SetupController(database, jwtManager, cache)
+  controllers := config.Providers(dbManager, jwtManager, cacheManager, mailManager, logManager)
 
   gin.ForceConsoleColor()
-  gin.SetMode(config.ServerSetting.RunMode)
+  gin.SetMode(viper.GetString("app.runMode"))
 
-  router := routers.InitRouter(jwtManager)
+  router := routers.InitRouter(jwtManager, controllers)
 
-  readTimeout := config.ServerSetting.ReadTimeout
-  writeTimeout := config.ServerSetting.WriteTimeout
-  endPoint := fmt.Sprintf(":%s", config.ServerSetting.HTTPPort)
+  readTimeout := viper.GetDuration("app.readTimeout")*time.Second
+  writeTimeout := viper.GetDuration("app.writeTimeout")*time.Second
+  endPoint := fmt.Sprintf(":%s", viper.GetString("app.port"))
   maxHeaderBytes := 1 << 20
 
   server := &http.Server{
@@ -54,10 +67,9 @@ func main() {
     MaxHeaderBytes: maxHeaderBytes,
   }
 
-  log.Printf("[info] start http server listening %s", endPoint)
+  logger.Info("Start http server listening", endPoint)
 
-  if config.ServerSetting.SSL {
-
+  if viper.GetBool("app.SSL") {
     SSLKeys := &struct {
       CERT string
       KEY  string
@@ -67,15 +79,41 @@ func main() {
     SSLKeys.CERT = "./cert/myCA.cer"
     SSLKeys.KEY = "./cert/myCA.key"
 
-    err := server.ListenAndServeTLS(SSLKeys.CERT, SSLKeys.KEY)
-    if err != nil {
-      log.Fatal("Web server (HTTPS): ", err)
-    }
+    go func() {
+      err := server.ListenAndServeTLS(SSLKeys.CERT, SSLKeys.KEY)
+      if err != nil {
+        logger.Fatal("Web server (HTTPS): ", err)
+      }
+    }()
   } else {
-    err := server.ListenAndServe()
-    if err != nil {
-      log.Fatal("Web server (HTTP): ", err)
-    }
+    go func() {
+      err := server.ListenAndServe()
+      if err != nil {
+        logger.Fatal("Web server (HTTP): ", err)
+      }
+    }()
   }
 
+  // Wait for interrupt signal to gracefully shutdown the server with
+  // a timeout of 5 seconds.
+  quit := make(chan os.Signal)
+  // kill (no param) default send syscall.SIGTERM
+  // kill -2 is syscall.SIGINT
+  // kill -9 is syscall.SIGKILL but can't be catch, so don't need add it
+  signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+  <-quit
+  logger.Info("Shutting down server...")
+
+  // The context is used to inform the server it has 5 seconds to finish
+  // the request it is currently handling
+  ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+  defer cancel()
+
+  logger.Info("Server exiting")
+  logManager.Shutdown()
+  dbManager.Shutdown()
+
+  if err := server.Shutdown(ctx); err != nil {
+    log.Fatal("Server forced to shutdown:", err)
+  }
 }

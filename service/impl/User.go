@@ -1,47 +1,53 @@
 package service_impl
 
 import (
-  "Food/pkg/domain"
-  "Food/dto"
-  "Food/helpers/jwt"
-  "Food/repository"
-  "Food/service"
-  "Food/service/mapper"
-
-  "golang.org/x/crypto/bcrypt"
+  "p2/pkg/domain"
+  "p2/dto"
+  "p2/helpers/page"
+  "p2/helpers/pagination"
+  "p2/pkg/service/Hash"
+  "p2/repository"
+  "p2/service"
+  "p2/service/mapper"
 )
 
 type user struct {
   repository repository.User
   mapper     mapper.User
-  jwtManager jwt.JwtManager
+  hashService Hash.Service
 }
 
-func NewUser(repository repository.User, mapper mapper.User, jwtManager jwt.JwtManager) service.User {
-  return &user{repository: repository, mapper: mapper, jwtManager: jwtManager}
+func NewUser(repository repository.User, mapper mapper.User, hashService Hash.Service) service.User {
+  return &user{repository: repository, mapper: mapper, hashService: hashService}
 }
 
 func (s *user) Create(userDTO dto.UserDTO) (dto.UserDTO, bool) {
-  pass, err := bcrypt.GenerateFromPassword([]byte(userDTO.Password), bcrypt.DefaultCost)
-  if err != nil {
+  pass := s.hashService.Make(userDTO.Password)
+  if pass == "" {
     return dto.UserDTO{}, false
   }
-  userDTO.Password = string(pass)
+  userDTO.Password = pass
   userDTO.Roles = append(userDTO.Roles, domain.ROLE_USER)
 
   user := s.mapper.ToEntity(userDTO)
-  s.repository.Save(user)
+
+  var err error
+  user, err = s.repository.Save(user)
+  if err != nil {
+    return userDTO, false
+  }
 
   return s.mapper.ToDTO(user), true
 }
 
-func (s *user) GetUserToken(userDTO dto.UserDTO) (string, error) {
-  tokenString, err := s.jwtManager.GenerateToken(userDTO.UserID, userDTO.Name, userDTO.GetRolesStr())
+func (s *user) Save(userDTO dto.UserDTO) (dto.UserDTO, bool) {
+  user := s.mapper.ToEntity(userDTO)
+  var err error
+  user, err = s.repository.Save(user)
   if err != nil {
-    return "", err
+    return userDTO, false
   }
-
-  return tokenString, nil
+  return s.mapper.ToDTO(user), true
 }
 
 func (s *user) FindOneLogin(username string, password string) (dto.UserDTO, bool) {
@@ -50,8 +56,8 @@ func (s *user) FindOneLogin(username string, password string) (dto.UserDTO, bool
     return dto.UserDTO{}, false
   }
 
-  errf := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
-  if errf != nil && errf == bcrypt.ErrMismatchedHashAndPassword {
+  valid := s.hashService.Check(user.Password, password)
+  if !valid {
     return dto.UserDTO{}, false
   }
 
@@ -76,6 +82,10 @@ func (s *user) FindOneByUsername(username string) (dto.UserDTO, bool) {
   return s.mapper.ToDTO(user), true
 }
 
-func (s *user) GenerateToken(userID string, username string, roles []string) (string, error) {
-  return s.jwtManager.GenerateToken(userID, username, roles)
+func (s *user) FindPage(pageable pagination.Pageable) page.Page {
+  return s.repository.FindPage(pageable)
+}
+
+func (s *user) Delete(id uint) {
+  s.repository.Delete(id)
 }

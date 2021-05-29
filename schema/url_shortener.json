@@ -1,0 +1,46 @@
+{
+  "models": [
+    {
+      "name": "Link",
+      "fields": [
+        { "name": "ShortUrl", "type": "string" },
+        { "name": "LongUrl", "type": "text" },
+        { "name": "LongUrlHash", "type": "string" },
+        { "name": "Ip", "type": "string" },
+        { "name": "ClickNum", "type": "uint" },
+        { "name": "SecretKey", "type": "string" },
+        { "name": "IsDisabled", "type": "bool" },
+        { "name": "IsCustom", "type": "bool" },
+        { "name": "IsApi", "type": "bool" }
+      ],
+      "indexes": [
+        {
+          "name": "idx_creation",
+          "fields": [ "Creator", "IsApi", "CreatedAt" ]
+        },
+        {
+          "name": "idx_shorten",
+          "fields": [ "ShortUrl" ]
+        }
+      ]
+    },
+    {
+      "name": "Click",
+      "fields": [
+        { "name": "Ip", "type": "string" },
+        { "name": "Country", "type": "string" },
+        { "name": "Referer", "type": "string" },
+        { "name": "RefererHost", "type": "string" },
+        { "name": "UserAgent", "type": "text" }
+      ]
+    }
+  ],
+  "relationships": [
+    { "from": "Link", "to": "Click", "type": "hasMany" },
+    { "from": "Link", "to": "User", "type": "belongsTo", "name": "Creator" },
+    { "from": "Click", "to": "Link", "type": "belongsTo" }
+  ],
+  "useRepoProxy": false,
+  "useServiceProxy": false,
+  "useController": false
+}

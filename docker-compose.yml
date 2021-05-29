@@ -53,5 +53,5 @@ volumes:
   dbdata:
     driver_opts: 
       o: bind
-      device: /Users/nguyenxuanhoangtu/Documents/projet/RecipeService/data/db/
+      device: /mnt/e/test/p2/data/db/
       type: bind

@@ -1,4 +1,4 @@
-BIN_NAME = Food
+BIN_NAME = p2
 BIN_PATH = ./build/${BIN_NAME}
 
 .PHONY: docs build run
