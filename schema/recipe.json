@@ -1,0 +1,79 @@
+{
+  "models": [
+    {
+      "name": "Category",
+      "fields": [
+        { "name": "Name", "type": "string" },
+        { "name": "Image", "type": "string" }
+      ]
+    },
+    {
+      "name": "Ingredient",
+      "fields": [
+        { "name": "Name", "type": "string" },
+        { "name": "Image", "type": "string" },
+        { "name": "Description", "type": "text" }
+      ]
+    },
+    {
+      "name": "UserLocationInteraction",
+      "fields": [
+        { "name": "Value", "type": "int32" }
+      ]
+    },
+    {
+      "name": "Location",
+      "fields": [
+        { "name": "Name", "type": "string" },
+        { "name": "Address", "type": "string" },
+        { "name": "Lng", "type": "float32" },
+        { "name": "Lat", "type": "float32" }
+      ]
+    },
+    {
+      "name": "LocationFeatures",
+      "fields": [
+      ]
+    },
+    {
+      "name": "Recipe",
+      "fields": [
+        { "name": "Name", "type": "string" },
+        { "name": "Description", "type": "text" },
+        { "name": "Image", "type": "string" },
+        { "name": "Photos", "type": "text" },
+        { "name": "Duration", "type": "uint32" },
+        { "name": "Steps", "type": "text" }
+      ]
+    },
+    {
+      "name": "RecipeIngredient",
+      "fields": [
+        { "name": "Quantity", "type": "uint32" }
+      ]
+    },
+    {
+      "name": "UserRecipeInteraction",
+      "fields": [
+        { "name": "Rating", "type": "int" },
+        { "name": "Review", "type": "text" }
+      ]
+    }
+  ],
+  "relationships": [
+    { "from": "Category", "to": "Recipe", "type": "manyToMany" },
+    { "from": "Recipe", "to": "RecipeIngredient", "type": "hasMany" },
+    { "from": "Ingredient", "to": "RecipeIngredient", "type": "hasMany" },
+    { "from": "RecipeIngredient", "to": "Recipe", "type": "belongsTo" },
+    { "from": "RecipeIngredient", "to": "Ingredient", "type": "belongsTo" },
+    { "from": "UserFeatures", "to": "User", "type": "belongsTo" },
+    { "from": "LocationFeatures", "to": "Location", "type": "belongsTo" },
+    { "from": "Recipe", "to": "UserRecipeInteraction", "type": "hasMany" },
+    { "from": "UserRecipeInteraction", "to": "User", "type": "belongsTo" },
+    { "from": "UserRecipeInteraction", "to": "Recipe", "type": "belongsTo" },
+    { "from": "UserLocationInteraction", "to": "User", "type": "belongsTo" },
+    { "from": "UserLocationInteraction", "to": "Location", "type": "belongsTo" }
+  ],
+  "useRepoProxy": false,
+  "useServiceProxy": false
+}

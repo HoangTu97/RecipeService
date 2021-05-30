@@ -2,6 +2,7 @@ runtime/
 docs/
 data/
 *.db
+/vendor
 
 App
 App.exe
